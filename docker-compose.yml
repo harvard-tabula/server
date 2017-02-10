@@ -1,7 +1,7 @@
 services:
   web:
     build: .
-    container_name: survey_web
+    container_name: tabula
     environment:
       APPLICATION_ENV: dev
       FLASK_DEBUG: 1
