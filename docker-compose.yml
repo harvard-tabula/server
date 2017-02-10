@@ -1,0 +1,12 @@
+services:
+  web:
+    build: .
+    container_name: survey_web
+    environment:
+      APPLICATION_ENV: dev
+      FLASK_DEBUG: 1
+    ports:
+      - "8080:8080"
+    volumes:
+      - .:/var/www
+version: "2"
