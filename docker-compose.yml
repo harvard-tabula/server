@@ -9,18 +9,19 @@ services:
       - "8080:8080"
     volumes:
       - .:/var/www
-    depends_on:
-      - postgres
+    links:
+      - postgres:postgres
 
   data:
-    image: postgres:9.6
+    restart: always
+    image: postgres:latest
     volumes:
       - .:/var/lib/postgresql
     command: "true"
-
+    
   postgres:
     restart: always
-    build: ./postgresql
+    image: postgres:latest
     volumes_from:
       - data
     ports:
