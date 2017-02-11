@@ -8,7 +8,7 @@ ENV LC_ALL C.UTF-8
 
 # install dependencies
 RUN apt-get update && apt-get install -y python3 python3-pip
-RUN pip3 install Flask
+RUN pip3 install Flask SQLAlchemy
 
 # copy code into container
 COPY . /var/www
