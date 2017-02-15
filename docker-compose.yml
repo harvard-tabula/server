@@ -2,12 +2,8 @@ services:
   web:
     build: .
     container_name: tabula
-    environment:
-      APPLICATION_ENV: ${APPLICATION_ENV}
-      FLASK_DEBUG: ${FLASK_DEBUG}
-      APP_SETTINGS: "${APP_SETTINGS}"
-      DATABASE_URL: "${DATABASE_URL}"
-      SECRET_KEY: "${SECRET_KEY}"
+    env_file:
+      - '.env'
     ports:
       - "8080:8080"
     volumes:

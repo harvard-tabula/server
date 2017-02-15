@@ -1,6 +1,7 @@
 from flask import Flask, session, request
 from flask_sqlalchemy import SQLAlchemy
 from . import config
+import os
 
 
 app = Flask(__name__)
@@ -52,7 +53,7 @@ def show_user_profile(user_id):
     return 'Hello user {}'.format(user_id)
 
 
-app.secret_key = app.config['SECRET_KEY']
+app.secret_key = os.environ['SECRET_KEY']
 
 if __name__ == '__main__':
     app.run()
