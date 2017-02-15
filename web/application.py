@@ -1,18 +1,33 @@
-import os
 from flask import Flask, session, request
+from flask_sqlalchemy import SQLAlchemy
 from . import config
 
-# print(os.environ)
 
-# configure application
 app = Flask(__name__)
 app.config.from_object(config.DevelopmentConfig)
-# app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+app.config['SQLALCHEMY_DATABASE_URI'] = 'http://0.0.0.0:5432'
+app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+db = SQLAlchemy(app)
+
+
+class User(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    email = db.Column(db.String(120), unique=True)
+
+    def __init__(self, email):
+        self.email = email
+
+    def __repr__(self):
+        return '<User %r>' % self.email
+
+# db.create_all()
 
 
 @app.route("/")
 def index():
-    # print(os.environ)
+    admin = User('admin@tabula.life')
+
+    # db.session.add(admin)
     return "The start of something beautiful!"
 
 
@@ -22,6 +37,7 @@ def login():
     session['username'] = request.form.get('username', '')
     """
     pass
+
 
 @app.route("/logout")
 def logout():
