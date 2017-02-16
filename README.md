@@ -21,7 +21,7 @@ docker-compose run --rm web bash
 # get onto the box 
 docker exec -it "tabula" bash
 
-# install other deps
+# install other deps ... e.g.
 apt-get install libpq-dev
 pip3 install psycopg2
 ```
