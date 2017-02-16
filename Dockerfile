@@ -7,7 +7,7 @@ ENV LANG C.UTF-8
 ENV LC_ALL C.UTF-8
 
 # install dependencies
-RUN apt-get update && apt-get install -y python3 python3-pip
+RUN apt-get update && apt-get install -y python3 python3-pip libpq-dev
 
 COPY ./web/requirements.txt /var/www/requirements.txt
 WORKDIR /var/www

@@ -6,7 +6,7 @@ import os
 
 app = Flask(__name__)
 app.config.from_object(config.DevelopmentConfig)
-app.config['SQLALCHEMY_DATABASE_URI'] = 'http://0.0.0.0:5432'
+app.config['SQLALCHEMY_DATABASE_URI'] = 'postgres://postgres:5432'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db = SQLAlchemy(app)
 
@@ -21,11 +21,12 @@ class User(db.Model):
     def __repr__(self):
         return '<User %r>' % self.email
 
-# db.create_all()
 
 
 @app.route("/")
 def index():
+    db.create_all()
+
     admin = User('admin@tabula.life')
 
     # db.session.add(admin)

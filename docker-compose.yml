@@ -1,3 +1,6 @@
+# https://docs.docker.com/compose/compose-file/
+
+version: "2"
 services:
   web:
     build: .
@@ -6,6 +9,8 @@ services:
       - '.env'
     ports:
       - "8080:8080"
+    depends_on:
+      - postgres
     volumes:
       - .:/var/www
     links:
@@ -25,4 +30,3 @@ services:
       - data
     ports:
       - "5432:5432"
-version: "2"
