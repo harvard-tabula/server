@@ -1,23 +1,6 @@
-from flask import Flask, session, request
-from flask_sqlalchemy import SQLAlchemy
-from . import config
+from . import app, db
+from .models import User
 import os
-
-
-app = Flask(__name__)
-app.config.from_object(config.DevelopmentConfig)
-db = SQLAlchemy(app)
-
-
-class User(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    email = db.Column(db.String(120), unique=True)
-
-    def __init__(self, email):
-        self.email = email
-
-    def __repr__(self):
-        return '<User %r>' % self.email
 
 
 @app.route("/")
@@ -52,4 +35,4 @@ def show_user_profile(user_id):
 app.secret_key = os.environ['SECRET_KEY']
 
 if __name__ == '__main__':
-    app.run(host='0.0.0.0')
+    app.run()
