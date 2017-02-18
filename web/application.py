@@ -6,8 +6,6 @@ import os
 
 app = Flask(__name__)
 app.config.from_object(config.DevelopmentConfig)
-app.config['SQLALCHEMY_DATABASE_URI'] = 'postgres://postgres:5432'
-app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db = SQLAlchemy(app)
 
 
@@ -22,15 +20,12 @@ class User(db.Model):
         return '<User %r>' % self.email
 
 
-
 @app.route("/")
 def index():
     db.create_all()
-
     admin = User('admin@tabula.life')
-
-    # db.session.add(admin)
-    return "The start of something beautiful!"
+    db.session.add(admin)
+    return "The stasrt of something beautiful!"
 
 
 @app.route("/login", methods=['POST'])
@@ -57,4 +52,4 @@ def show_user_profile(user_id):
 app.secret_key = os.environ['SECRET_KEY']
 
 if __name__ == '__main__':
-    app.run()
+    app.run(host='0.0.0.0')

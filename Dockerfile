@@ -1,11 +1,6 @@
 FROM ubuntu:16.04
 EXPOSE 8080
 
-# set environment variables
-ENV FLASK_APP ./web/application.py
-ENV LANG C.UTF-8
-ENV LC_ALL C.UTF-8
-
 # install dependencies
 RUN apt-get update && apt-get install -y python3 python3-pip
 RUN apt-get install -y libpq-dev

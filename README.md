@@ -16,12 +16,5 @@ docker-compose up
 docker-compose run --rm web bash
 ```
 
-# Debugging tips
-```
-# get onto the box 
-docker exec -it "tabula" bash
-
-# install other deps ... e.g.
-apt-get install libpq-dev
-pip3 install psycopg2
-```
+# Recommended reading 
+* https://docs.docker.com/engine/examples/postgresql_service/
