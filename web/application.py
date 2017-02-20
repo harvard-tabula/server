@@ -1,14 +1,10 @@
-from . import app, db
-from .models import User
+from . import app
 import os
 
 
 @app.route("/")
 def index():
-    db.create_all()
-    admin = User('admin@tabula.life')
-    db.session.add(admin)
-    return "The stasrt of something beautiful!"
+    return "The start of something beautiful!"
 
 
 @app.route("/login", methods=['POST'])
