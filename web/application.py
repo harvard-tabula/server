@@ -1,6 +1,6 @@
-from . import app
+from . import app, models
 import os
-
+from flask_restful import Resource, Api
 
 @app.route("/")
 def index():
