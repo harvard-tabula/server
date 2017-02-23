@@ -87,8 +87,8 @@ class OAuth2Callback(Resource):
                 email = user_data['email']
                 user = User.query.filter_by(email=email).first()
                 if user is None:
-                    name = user['name']
-                    avatar = user['picture']
+                    name = user_data['name']
+                    avatar = user_data['picture']
                     tokens = json.dumps(token)
                     user = User(email, name, avatar, tokens)
 
