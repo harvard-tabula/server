@@ -49,8 +49,9 @@ class User(db.Model):
     tokens = db.Column(db.Text)
     created_at = db.Column(db.DateTime, default=datetime.datetime.utcnow())
 
-    def __init__(self, email):
+    def __init__(self, email, name, avatar, tokens):
         self.email = email
+        self.name = name
         # TODO Instantiate row with appropriate hash in UserProfile and UserHistory
 
     def __repr__(self):
