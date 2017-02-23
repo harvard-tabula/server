@@ -19,3 +19,4 @@ docker-compose run --rm web bash
 # Recommended reading 
 * https://docs.docker.com/engine/examples/postgresql_service/
 * https://realpython.com/blog/python/flask-by-example-part-2-postgres-sqlalchemy-and-alembic/
+* https://blog.miguelgrinberg.com/post/oauth-authentication-with-flask 

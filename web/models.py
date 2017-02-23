@@ -1,4 +1,5 @@
 from . import db
+import datetime
 
 
 interests = db.Table('interests',
@@ -41,7 +42,12 @@ class Milestone(db.Model):
 
 class User(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    email = db.Column(db.String(255), unique=True)
+    email = db.Column(db.String(255), unique=True, nullable=False)
+    name = db.Column(db.String(100))
+    avatar = db.Column(db.String(200))
+    active = db.Column(db.Boolean, default=False)
+    tokens = db.Column(db.Text)
+    created_at = db.Column(db.DateTime, default=datetime.datetime.utcnow())
 
     def __init__(self, email):
         self.email = email
