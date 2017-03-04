@@ -1,4 +1,5 @@
-from . import app, models, db
+from . import app, db
+from .models import User, UserHistory, UserProfile
 import os
 from flask import redirect, session, request
 from flask_restful import Resource, Api
@@ -7,10 +8,7 @@ from requests_oauthlib import OAuth2Session
 from requests.exceptions import HTTPError
 from .config import Auth
 import json
-
-User = models.User
-api = Api(app)
-
+import hashlib
 
 login_manager = LoginManager(app)
 login_manager.login_view = "login"
@@ -37,6 +35,14 @@ def get_google_auth(state=None, token=None):
     return oauth
 
 
+def get_user_hash(app_unique_id):
+    user_hash = hashlib.pbkdf2_hmac('sha256',
+                                    bytes(app_unique_id, encoding='utf-8'),
+                                    bytes(app.config['SALT'], encoding='utf-8'),
+                                    100000)
+    return user_hash
+
+
 class Login(Resource):
 
     def get(self):
@@ -53,7 +59,7 @@ class OAuth2Callback(Resource):
 
     def get(self):
 
-        if current_user is not None and current_user.is_authenticated:
+        if current_user is not None and current_user.is_authenticated:  # TODO Hash stored in session?
             return redirect('profile')
 
         if 'error' in request.args:
@@ -75,6 +81,7 @@ class OAuth2Callback(Resource):
                 return {'state': '500', 'message': 'Unable to authenticate token.'}
             google = get_google_auth(token=token)
             resp = google.get(Auth.USER_INFO)
+
             if resp.status_code == 200:
                 user_data = resp.json()
                 hd = user_data.get('hd')
@@ -83,17 +90,32 @@ class OAuth2Callback(Resource):
 
                 email = user_data['email']
                 user = User.query.filter_by(email=email).first()
-                if user is None:
+                user_hash = get_user_hash(user_data['id'])
+                session['user_hash'] = user_hash
+
+                if user is None:  # New user
+
                     name = user_data['name']
                     avatar = user_data['picture']
-                    tokens = json.dumps(token)
-                    user = User(email, name, avatar, tokens)
-                user.active = True
+                    user = User(email, name, avatar)
+
+                    user_profile = UserProfile(session['user_hash'])
+                    db.session.add(user_profile)
+                    db.session.commit()
+
+                    user.active = True
+
+                # Update or instantiate user's oauth tokens
+                tokens = json.dumps(token)
+                user.tokens = tokens
 
                 db.session.add(user)
                 db.session.commit()
+
                 login_user(user, remember=False)
+
                 return redirect('profile')
+
             return {'state': 500, 'message': 'Unable to authenticate token.'}
 
 
@@ -119,6 +141,7 @@ class Profile(Resource):
         return {'state': 200, 'data': {'UserProfile': True, 'UserHistory': True}}
 
 
+api = Api(app)
 api.add_resource(Login, '/login', endpoint='login')
 api.add_resource(OAuth2Callback, '/oauth2callback', endpoint='oauth2callback')
 api.add_resource(Logout, '/logout', endpoint='logout')

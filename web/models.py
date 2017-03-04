@@ -49,12 +49,10 @@ class User(db.Model):
     tokens = db.Column(db.Text)
     created_at = db.Column(db.DateTime, default=datetime.datetime.utcnow())
 
-    def __init__(self, email, name, avatar, tokens):
+    def __init__(self, email, name, avatar):
         self.email = email
         self.name = name
         self.avatar = avatar
-        self.tokens = tokens
-        # TODO Instantiate row with appropriate hash in UserProfile and UserHistory
 
     @property
     def is_active(self):
@@ -77,7 +75,7 @@ class User(db.Model):
 
 class UserProfile(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    user_hash = db.Column(db.String(255), unique=True)
+    user_hash = db.Column(db.String(255), unique=True, nullable=False)
     concentration_id = db.Column(db.Integer, db.ForeignKey('concentration.id'))
     gender = db.Column(db.String(10))
     ethnicity = db.Column(db.String(20))
@@ -85,8 +83,8 @@ class UserProfile(db.Model):
     year = db.Column(db.String(4))
     interests = db.relationship('Interest', secondary=interests,
                                 backref=db.backref('user_profiles', lazy='dynamic'))
-    # milestones = db.relationship('Milestone', secondary=milestones,
-    #                              backref=db.backref('user_profiles'))
+    milestones = db.relationship('Milestone', secondary=milestones,
+                                 backref=db.backref('user_profiles'))
 
     def __init__(self, user_hash, concentration_id=None, year=None, years_coding=None, gender=None, ethnicity=None):
         self.user_hash = user_hash
@@ -106,7 +104,7 @@ class Concentration(db.Model):
     user_profiles = db.relationship('UserProfile', backref='concentration')
 
     def __init__(self, name):
-        self.name = nameconuser
+        self.name = name
 
     def __repr__(self):
         return '<Concentration {}>'.format(self.name)
@@ -133,7 +131,7 @@ class Course(db.Model):
 
 class UserHistory(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    user_hash = db.Column(db.String(255), unique=True)
+    user_hash = db.Column(db.String(255), unique=True, nullable=False)
     course_id = db.Column(db.Integer, db.ForeignKey('course.id'))
     semester_id = db.Column(db.Integer, db.ForeignKey('semester.id'))
     grade = db.Column(db.String(3))
@@ -142,17 +140,18 @@ class UserHistory(db.Model):
     learning = db.Column(db.Integer)
     enjoyment = db.Column(db.Integer)
 
-    def __init__(self, user_hash, course_id, semester_id, grade, hours, difficulty=None, learning=None, enjoyment=None):
+    def __init__(self, user_hash, course_id, semester_id, grade, hours=None, difficulty=None, learning=None, enjoyment=None):
         self.user_hash = user_hash
         self.course_id = course_id
         self.semester_id = semester_id
+        self.hours = hours
         self.grade = grade
         self.difficulty = difficulty
         self.learning = learning
         self.enjoyment = enjoyment
 
-        def __repr__(self):
-            return '<UserHistory {} {}>'.format(self.course_id, self.grade)
+    def __repr__(self):
+        return '<UserHistory {} {}>'.format(self.course_id, self.grade)
 
 
 class Semester(db.Model):
