@@ -52,7 +52,24 @@ class User(db.Model):
     def __init__(self, email, name, avatar, tokens):
         self.email = email
         self.name = name
+        self.avatar = avatar
+        self.tokens = tokens
         # TODO Instantiate row with appropriate hash in UserProfile and UserHistory
+
+    @property
+    def is_active(self):
+        return self.active
+
+    @property
+    def is_anonymous(self):
+        return False
+
+    @property
+    def is_authenticated(self):  # User is allowed to authenticate
+        return True
+
+    def get_id(self):
+        return str(self.id)
 
     def __repr__(self):
         return '<User {}>'.format(self.email)

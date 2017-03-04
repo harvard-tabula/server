@@ -1,8 +1,8 @@
 from . import app, models, db
 import os
-from flask import url_for, redirect, session, request
+from flask import redirect, session, request
 from flask_restful import Resource, Api
-from flask_login import LoginManager, login_required, login_user, logout_user, current_user, UserMixin
+from flask_login import LoginManager, login_required, login_user, logout_user, current_user
 from requests_oauthlib import OAuth2Session
 from requests.exceptions import HTTPError
 from .config import Auth
@@ -18,8 +18,8 @@ login_manager.session_protection = "strong"
 
 
 @login_manager.user_loader
-def load_user(id):
-    return User.query.get(int(id))
+def load_user(user_id):
+    return User.query.get(int(user_id))
 
 
 def get_google_auth(state=None, token=None):
@@ -37,24 +37,16 @@ def get_google_auth(state=None, token=None):
     return oauth
 
 
-class HelloWorld(Resource):
-    def get(self):
-        return {'hello': 'world'}
-
-api.add_resource(HelloWorld, '/')
-
-
 class Login(Resource):
+
     def get(self):
         if current_user.is_authenticated:
-            return {'logged': 'in'}
+            return redirect('/profile')
         google = get_google_auth()
         auth_url, state = google.authorization_url(
-            Auth.AUTH_URI, access_type='offline')
+            Auth.AUTH_URI, access_type='offline', hd='college.harvard.edu')
         session['oauth_state'] = state
-        return redirect(auth_url, code=302)
-
-api.add_resource(Login, '/login')
+        return redirect(auth_url)
 
 
 class OAuth2Callback(Resource):
@@ -84,6 +76,10 @@ class OAuth2Callback(Resource):
             resp = google.get(Auth.USER_INFO)
             if resp.status_code == 200:
                 user_data = resp.json()
+                hd = user_data.get('hd')
+                if not hd or hd != 'college.harvard.edu':
+                    return {'state': 403, 'message': 'Only Harvard College students have access to Tabula.'}
+
                 email = user_data['email']
                 user = User.query.filter_by(email=email).first()
                 if user is None:
@@ -91,29 +87,41 @@ class OAuth2Callback(Resource):
                     avatar = user_data['picture']
                     tokens = json.dumps(token)
                     user = User(email, name, avatar, tokens)
+                user.active = True
 
                 db.session.add(user)
                 db.session.commit()
-                login_user(user)
-                return {'state': 'success', 'data': user_data}
+                login_user(user, remember=False)
+                return redirect('/profile')
             return {'state': 'could not fetch information'}
 
 
-api.add_resource(OAuth2Callback, '/oauth2callback')
+class Logout(Resource):
+
+    decorators = [login_required]
+
+    def get(self):
+        if app.config['DEBUG']:
+            logout_user()
+            return redirect('https://www.tabula.life')
+        return {'state': 400, 'message': 'Logout requests must be made via post in production.'}
+
+    def post(self):
+        logout_user()
+        return redirect('https://www.tabula.life')
 
 
-@app.route("/logout")
-def logout():
-    """
-    session.pop('username', None)
-    """
-    pass
+class Profile(Resource):
+    decorators = [login_required]
+
+    def get(self):
+        return {'state': 200, 'data': {'UserProfile': True, 'UserHistory': True}}
 
 
-@login_required
-@app.route('/profile/<int:user_id>')
-def show_user_profile(user_id):
-    return 'Hello user {}'.format(user_id)
+api.add_resource(Login, '/login', endpoint='login')
+api.add_resource(OAuth2Callback, '/oauth2callback', endpoint='oauth2callback')
+api.add_resource(Logout, '/logout', endpoint='logout')
+api.add_resource(Profile, '/profile', endpoint='profile')
 
 app.secret_key = os.environ['SECRET_KEY']
 
