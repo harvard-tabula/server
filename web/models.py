@@ -125,11 +125,12 @@ class Course(db.Model):
     course_histories = db.relationship('UserHistory',  backref='course')
     department = db.Column(db.Integer, db.ForeignKey('department.id'))
 
-    def __init__(self, course_id, name_short, name_long, description):
+    def __init__(self, course_id, name_short, name_long, description, department):
         self.course_id = course_id
         self.name_short = name_short
         self.name_long = name_long
         self.description = description
+        self.department = department
 
     def __repr__(self):
         return '<Course {} - {}>'.format(self.course_id, self.name_short)
