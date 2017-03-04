@@ -52,18 +52,19 @@ class Login(Resource):
 class OAuth2Callback(Resource):
 
     def get(self):
-        # Redirect user to home page if already logged in.
+
         if current_user is not None and current_user.is_authenticated:
-            return {'state': 'already logged in'}
+            return redirect('profile')
+
         if 'error' in request.args:
             if request.args.get('error') == 'access_denied':
-                return {'state': 'user denied access'}
-            return {'state': 'error'}
+                return {'state': 401, 'message': 'User denied access to Tabula.'}
+            return {'state': 400}
+
         if 'code' not in request.args and 'state' not in request.args:
-            return {'state': 'must login'}
+            return {'state': 400}
+
         else:
-            # Execution reaches here when user has
-            # successfully authenticated our app.
             google = get_google_auth(state=session['oauth_state'])
             try:
                 token = google.fetch_token(
@@ -71,14 +72,14 @@ class OAuth2Callback(Resource):
                     client_secret=Auth.CLIENT_SECRET,
                     authorization_response=request.url)
             except HTTPError:
-                return {'state': 'HTTPError'}
+                return {'state': '500', 'message': 'Unable to authenticate token.'}
             google = get_google_auth(token=token)
             resp = google.get(Auth.USER_INFO)
             if resp.status_code == 200:
                 user_data = resp.json()
                 hd = user_data.get('hd')
                 if not hd or hd != 'college.harvard.edu':
-                    return {'state': 403, 'message': 'Only Harvard College students have access to Tabula.'}
+                    return {'state': 401, 'message': 'Only Harvard College students have access to Tabula.'}
 
                 email = user_data['email']
                 user = User.query.filter_by(email=email).first()
@@ -92,8 +93,8 @@ class OAuth2Callback(Resource):
                 db.session.add(user)
                 db.session.commit()
                 login_user(user, remember=False)
-                return redirect('/profile')
-            return {'state': 'could not fetch information'}
+                return redirect('profile')
+            return {'state': 500, 'message': 'Unable to authenticate token.'}
 
 
 class Logout(Resource):
@@ -103,7 +104,7 @@ class Logout(Resource):
     def get(self):
         if app.config['DEBUG']:
             logout_user()
-            return redirect('https://www.tabula.life')
+            return {'state': 200, 'message': 'Successfully logged out.'}
         return {'state': 400, 'message': 'Logout requests must be made via post in production.'}
 
     def post(self):
