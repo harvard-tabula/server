@@ -110,23 +110,29 @@ class Concentration(db.Model):
         return '<Concentration {}>'.format(self.name)
 
 
-class Course(db.Model):
-    # TODO add prerequisites = db.relationship('Course', backref='course', ...)
+class Department(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    code = db.Column(db.Integer)           # e.g. 1452974
+    name_long = db.Column(db.String(255))
+    courses = db.relationship('Course', backref='department')
+
+
+class Course(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    course_id = db.Column(db.Integer)           # e.g. 1452974
     name_short = db.Column(db.String(20))  # e.g. CS164
     name_long = db.Column(db.String(255))  # e.g. Software Engineering
     description = db.Column(db.Text)
     course_histories = db.relationship('UserHistory',  backref='course')
+    department = db.Column(db.Integer, db.ForeignKey('department.id'))
 
-    def __init__(self, code, name_short, name_long, description):
-        self.code = code
+    def __init__(self, course_id, name_short, name_long, description):
+        self.course_id = course_id
         self.name_short = name_short
         self.name_long = name_long
         self.description = description
 
     def __repr__(self):
-        return '<Course {} - {}>'.format(self.code, self.name_short)
+        return '<Course {} - {}>'.format(self.course_id, self.name_short)
 
 
 class UserHistory(db.Model):
