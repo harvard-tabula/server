@@ -1,0 +1,195 @@
+id,course_group,course_group_code
+1,African and African American Studies,AFRAMER
+2,Gikuyu,GIKUYU
+3,Swahili,SWAHILI
+4,Twi,TWI
+5,Yoruba,YORUBA
+6,Anthropology,ANTHRO
+7,Design,DESIGN
+8,Regional Studies _ East Asia,RSEA
+9,Astronomy,ASTRON
+10,Biological Sciences in Dental Medicine,BSDM
+11,BPH,BPH
+12,Biophysics,BIOPHYS
+13,Biostatistics,BIOSTAT
+14,Business Studies,BUSSTUD
+15,Celtic,CELTIC
+16,Irish,IRISH
+17,Scottish Gaelic,SCOTGAELIC
+18,Welsh,WELSH
+19,Chemical Biology,CHEMBIO
+20,Chemical and Physical Biology,CPB
+21,Chemistry,CHEM
+22,Life and Physical Sciences,LPS
+23,Physical Sciences,PHYSCI
+24,Comparative Literature,COMPLIT
+25,Literature,LITER
+26,Dramatic Arts,DRAMA
+27,Earth and Planetary Sciences,E-PSCI
+28,Chinese,CHNSE
+29,Chinese History,CHNSHIS
+30,Chinese Literature,CHNSLIT
+31,East Asian Buddhist Studies,EABS
+32,East Asian Film and Media Studies,EAFM
+33,East Asian Studies,EASTD
+34,Japanese,JAPAN
+35,Japanese History,JAPNHIST
+36,Japanese Literature,JAPNLIT
+37,Korean,KOREAN
+38,Korean History,KORHIST
+39,Korean Literature,KORLIT
+40,Manchu,MANCHU
+41,Mongolian,MONGOLN
+42,Tibetan History,TIBHIST
+43,Uyghur,UYGHUR
+44,Vietnamese,VIETNAM
+45,Economics,ECON
+46,Applied Computation,APCOMP
+47,Applied Mathematics,APMTH
+48,Applied Physics,APPHY
+49,Biomedical Engineering,BE
+50,Computer Science,COMPSCI
+51,Engineering Sciences,ENG-SCI
+52,English,ENGLISH
+53,Environmental Science and Public Policy,ESPP
+54,Expository Writing,EXPOS
+55,Folklore and Mythology,FOLKMYTH
+56,Freshman Seminar,FRSEMR
+57,Aesthetic and Interpretive Understanding,AESTH&INTP
+58,Culture and Belief,CULTR&BLF
+59,Empirical and Mathematical Reasoning,E&M-REASON
+60,Ethical Reasoning,ETH-REASON
+61,Science of Living Systems,SCI-LIVSYS
+62,Science of the Physical Universe,SCI-PHYUNV
+63,Societies of the World,SOC-WORLD
+64,United States in the World,US-WORLD
+65,German,GERMAN
+66,Germanic Philology,GERMPHIL
+67,Scandinavian,SCAND
+68,Swedish,SWEDISH
+69,Global Health and Health Policy,GHHP
+70,Government,GOV
+71,Health Policy,HLTHPOL
+72,History,HIST
+73,History and Literature,HIST-LIT
+74,American Civilization,AM-CIV
+75,History of Art and Architecture,HAA
+76,History of Science,HISTSCI
+77,Winthrop,HSEMR-WI
+78,Human Evolutionary Biology,HEB
+79,Life Sciences,LIFESCI
+80,Linguistics,LING
+81,Mathematics,MATH
+82,BBS,BBS
+83,BCMP,BCMP
+84,Cell Biology,CELLBIO
+85,DRB,DRB
+86,Genetics,GENETIC
+87,HBTM,HBTM
+88,Immunology,IMUNOL
+89,Medical Sciences,MED-SCI
+90,Microbiology,MICROBI
+91,Neurobiology,NEUROBIO
+92,Pathology,PATHOL
+93,SHBT,SHBT
+94,Virology,VIROLOGY
+95,Medieval Studies,MEDVLSTD
+96,Middle Eastern Studies,MES
+97,"Mind, Brain, and Behavior",MBB
+98,MCB,MCB
+99,Music,MUSIC
+100,Akkadian,AKKAD
+101,Ancient Near East,ANE
+102,Arabic,ARABIC
+103,Aramaic,ARAMAIC
+104,Armenian,ARMEN
+105,Armenian Studies,ARMENST
+106,Classical Hebrew,CLAS-HEB
+107,Egyptian,EGYPTIAN
+108,Hebrew,HEBREW
+109,Iranian,IRANIAN
+110,Islamic Civilizations,ISLAMCIV
+111,Jewish Studies,JEWISHST
+112,Modern Hebrew,MOD-HEB
+113,The Modern Middle East,MODMIDEAST
+114,Near Eastern Civilizations,NEC
+115,Persian,PERSIAN
+116,Semitic Philology,SEMPHIL
+117,Sumerian,SUMERIAN
+118,Turkish,TURKISH
+119,Yiddish,YIDDISH
+120,Generic,GENERIC
+121,OEB,OEB
+122,Philosophy,PHIL
+123,Physics,PHYSICS
+124,Psychology,PSY
+125,Catalan,CATALAN
+126,French,FRENCH
+127,Italian,ITAL
+128,Latin American Studies,LAT-STD
+129,Portuguese,PORTUG
+130,Romance Languages,ROM-LANG
+131,Romance Studies,ROM-STD
+132,Spanish,SPANSH
+133,"Regional Studies _ Russia, Eastern Europe, and Central Asia",RSRA
+134,Slavic,SLAVIC
+135,Social Policy,SPOL
+136,Social Studies,SOC-STD
+137,Sociology,SOCIOL
+138,Nepali,NEP
+139,Pali,PAL
+140,Sanskrit,SANSKRIT
+141,South Asian Studies,SAS
+142,Tamil,TAM
+143,Thai,THI
+144,Tibetan,TIBET
+145,Urdu,URD
+146,Special Concentrations,SPC-CONC
+147,Statistics,STAT
+148,SCRB,SCRB
+149,"Studies of Women, Gender, and Sexuality",WOMGEN
+150,Systems Biology,SYSTBIO
+151,Classical Studies,CLAS-STDY
+152,Classical Archaeology,CLASARCH
+153,Classical Philology,CLASPHIL
+154,Classics,CLASSIC
+155,Greek,GREEK
+156,Latin,LATIN
+157,Medieval Greek,MEDGREEK
+158,Medieval Latin,MEDLATIN
+159,Modern Greek,MODGRK
+160,Religion,RELIGION
+161,Ukrainian,UKRAN
+162,Visual and Environmental Studies,VES
+477,American Studies,AMSTUDIES
+478,Germanic Studies,GERM-STD
+479,Humanities,HUMAN
+480,BCS,BCS
+481,Czech,CZCH
+482,Polish,PLSH
+483,Russian,RUSS
+484,Extra-Departmental Courses,EDC
+485,Unknown,
+486,Humanities Studio,HUM-STUDIO
+487,Lowell,HSEMR-LO
+488,Mather,HSEMR-MA
+489,Pforzheimer,HSEMR-PF
+492,"South Asian Languages, Literatures, and Cultures",SALLC
+495,Hindi-Urdu,HINDI-URDU
+496,Humanities: Frameworks,HUM-FRAMES
+497,Humanities: Essential Questions,HUM-QSTNS
+498,Leverett,HSEMR-LE
+499,"Theater, Dance & Media",TDM
+501,Graduate Research,TIME-R
+503,Independent Study,INDSTUDY
+504,"Ethnicity, Migration, Rights",EMR
+505,TIME-T,TIME-T
+506,TIME-C,TIME-C
+507,TIME-A,TIME-A
+508,CLS-STDY,CLS-STDY
+510,XPRN,XPRN
+511,XPBH,XPBH
+512,XEDU,XEDU
+513,XLAW,XLAW
+514,Neuroscience,NEURO
+515,Population Health Sciences,PHS

@@ -100,20 +100,18 @@ class UserProfile(db.Model):
 
 class Concentration(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String(30))
+    name = db.Column(db.String(255))
+    group_code = db.Column(db.String(30))
     user_profiles = db.relationship('UserProfile', backref='concentration')
+    courses = db.relationship('Course', backref='concentration')
 
-    def __init__(self, name):
+    def __init__(self, dpt_id, name, group_code):
+        self.id = dpt_id
         self.name = name
+        self.group_code = group_code
 
     def __repr__(self):
         return '<Concentration {}>'.format(self.name)
-
-
-class Department(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    name_long = db.Column(db.String(255))
-    courses = db.relationship('Course', backref='department')
 
 
 class Course(db.Model):
@@ -123,14 +121,14 @@ class Course(db.Model):
     name_long = db.Column(db.String(255))  # e.g. Software Engineering
     description = db.Column(db.Text)
     course_histories = db.relationship('UserHistory',  backref='course')
-    department = db.Column(db.Integer, db.ForeignKey('department.id'))
+    concentration_id = db.Column(db.Integer, db.ForeignKey('concentration.id'))
 
-    def __init__(self, course_id, name_short, name_long, description, department):
+    def __init__(self, course_id, name_short, name_long, description, concentration_id):
         self.course_id = course_id
         self.name_short = name_short
         self.name_long = name_long
         self.description = description
-        self.department = department
+        self.concentration_id = concentration_id
 
     def __repr__(self):
         return '<Course {} - {}>'.format(self.course_id, self.name_short)

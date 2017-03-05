@@ -22,3 +22,5 @@ docker-compose run --rm web bash
 * https://blog.miguelgrinberg.com/post/designing-a-restful-api-using-flask-restful
 * http://bitwiser.in/2015/09/09/add-google-login-in-flask.html
 * https://www.postgresql.org/docs/current/static/sql-keywords-appendix.html & http://dba.stackexchange.com/questions/110550/why-cant-i-see-my-table-postgresql-when-i-use-dt-inside-psql
+* http://container-solutions.com/understanding-volumes-docker/
+* http://alembic.zzzcomputing.com/en/latest/tutorial.html
