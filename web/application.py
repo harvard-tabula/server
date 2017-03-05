@@ -1,5 +1,5 @@
 from . import app, db
-from .models import User, UserHistory, UserProfile
+from .models import User, UserHistory, UserProfile, Course
 import os
 from flask import redirect, session, request
 from flask_restful import Resource, Api
@@ -141,11 +141,28 @@ class Profile(Resource):
         return {'state': 200, 'data': {'UserProfile': True, 'UserHistory': True}}
 
 
+class Courses(Resource):
+    decorators = [login_required]
+
+    def get(self, query):
+        results = Course.query.filter(Course.name_short.like(query)).limit(5)
+        courses = []
+        for result in results:
+            courses.append({'catalogue_number': result.name_short,
+                            'title': result.name_long,
+                            'description': result.description
+                            })
+
+        return {'state': 200, 'data': courses}
+
+
 api = Api(app)
 api.add_resource(Login, '/login', endpoint='login')
 api.add_resource(OAuth2Callback, '/oauth2callback', endpoint='oauth2callback')
 api.add_resource(Logout, '/logout', endpoint='logout')
 api.add_resource(Profile, '/profile', endpoint='profile')
+api.add_resource(Courses, '/courses/<string:query>', endpoint='courses')
+
 
 app.secret_key = os.environ['SECRET_KEY']
 

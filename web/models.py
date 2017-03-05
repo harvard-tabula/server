@@ -111,13 +111,13 @@ class Concentration(db.Model):
         self.group_code = group_code
 
     def __repr__(self):
-        return '<Concentration {}>'.format(self.name)
+        return '<{}>'.format(self.name)
 
 
 class Course(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     course_id = db.Column(db.Integer)           # e.g. 1452974
-    name_short = db.Column(db.String(20))  # e.g. CS164
+    name_short = db.Column(db.String(20))  # e.g. COMPSCI 164
     name_long = db.Column(db.String(255))  # e.g. Software Engineering
     description = db.Column(db.Text)
     course_histories = db.relationship('UserHistory',  backref='course')
