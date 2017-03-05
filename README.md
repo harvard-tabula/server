@@ -16,6 +16,11 @@ docker-compose up
 docker-compose run --rm web bash
 ```
 
+# Development tips
+* It's pretty convenient to test the API in your browser when developing locally. To do this you'll need to set an alias for `tabula.life` in `/etc/hosts` and then hit the API at `tabula.life:8080/<route>`. This is a bit of a hack around the domain's Google allows you to redirect the user to after receiving oauth.
+* Run `python3 manage.py db {migrate | upgrade}` to get your DB up to date. If all hell breaks loose, but you're certain that the current schema is correct, even if alembic doesn't think so, run `python3 manage.py db alembic stamp head`. To populate the tables for local dev run `populate_db.py`. All of these commands need to be run from within the `tabula` container. You can hop on using `docker exec -it 'tabula' bash`.
+
+
 # Recommended reading 
 * https://docs.docker.com/engine/examples/postgresql_service/
 * https://realpython.com/blog/python/flask-by-example-part-2-postgres-sqlalchemy-and-alembic/
