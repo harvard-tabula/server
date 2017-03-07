@@ -29,6 +29,60 @@ def load_concentrations(path):
             db.session.add(course)
     db.session.commit()
 
+
+def load_tags():
+
+    tags = {
+        ('AI', 'academic'),
+        ('Algorithms', 'academic'),
+        ('Coding', 'academic'),
+        ('Computational Biology', 'academic'),
+        ('Computer Architecture', 'academic'),
+        ('Computer Networking', 'academic'),
+        ('Data Structures', 'academic'),
+        ('Graphics', 'academic'),
+        ('ML', 'academic'),
+        ('Networks', 'academic'),
+        ('Policy', 'academic'),
+        ('Programming Languages', 'academic'),
+        ('Robotics', 'academic'),
+        ('Security', 'academic'),
+        ('Systems', 'academic'),
+        ('Consulting', 'professional'),
+        ('Data Science', 'professional'),
+        ('Design', 'professional'),
+        ('DevOps', 'professional'),
+        ('Finance', 'professional'),
+        ('PM', 'professional'),
+        ('SWE - Backend', 'professional'),
+        ('SWE - Frontend', 'professional'),
+        ('C', 'language'),
+        ('C++ ', 'language'),
+        ('Haskell', 'language'),
+        ('JAVA', 'language'),
+        ('JavaScript', 'language'),
+        ('OCaml', 'language'),
+        ('Python', 'language'),
+        ('R', 'language'),
+        ('Built a mobile app', 'milestone'),
+        ('Built a server', 'milestone'),
+        ('Built a web-app', 'milestone'),
+        ('Created a model', 'milestone'),
+        ('Proof-Based Math', 'milestone')
+    }
+
+    for tag in tags:
+        name, category = tag
+        tag_to_add = models.Tag(name, category)
+        db.session.add(tag_to_add)
+
+    db.session.commit()
+
+
 if __name__ == '__main__':
+    db.drop_all()
+    db.create_all()
+
+    load_tags()
     load_concentrations('./data/departments.csv')
     load_courses('./data/course_table.csv')

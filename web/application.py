@@ -10,6 +10,12 @@ from .config import Auth
 import json
 import hashlib
 
+api = Api(app)
+
+###############################
+# AUTHENTICATION
+###############################
+
 login_manager = LoginManager(app)
 login_manager.login_view = "login"
 login_manager.session_protection = "strong"
@@ -134,15 +140,42 @@ class Logout(Resource):
         return redirect('https://www.tabula.life')
 
 
+api.add_resource(Login, '/login', endpoint='login')
+api.add_resource(OAuth2Callback, '/oauth2callback', endpoint='oauth2callback')
+api.add_resource(Logout, '/logout', endpoint='logout')
+
+
+###############################
+# STATEFUL RESOURCES
+###############################
 class Profile(Resource):
     decorators = [login_required]
 
     def get(self):
         return {'state': 200, 'data': {'UserProfile': True, 'UserHistory': True}}
 
+    def post(self):
+        pass
 
-class Courses(Resource):
+
+class History(Resource):
     decorators = [login_required]
+
+    def get(self):
+        pass
+
+    def post(self):
+        pass
+
+
+api.add_resource(Profile, '/profile', endpoint='profile')
+api.add_resource(UserHistory, '/history', endpoint='history')
+
+
+###############################
+# STATELESS RESOURCES
+###############################
+class Courses(Resource):
 
     def get(self, query):
         results = Course.query.filter(Course.name_short.like(query)).limit(5)
@@ -155,16 +188,65 @@ class Courses(Resource):
 
         return {'state': 200, 'data': courses}
 
+    @login_required
+    def post(self):
+        pass
 
-api = Api(app)
-api.add_resource(Login, '/login', endpoint='login')
-api.add_resource(OAuth2Callback, '/oauth2callback', endpoint='oauth2callback')
-api.add_resource(Logout, '/logout', endpoint='logout')
-api.add_resource(Profile, '/profile', endpoint='profile')
+
+class Tags(Resource):
+
+    def get(self, query):
+        pass
+
+    @login_required
+    def post(self):
+        pass
+
+
+class Concentrations(Resource):
+
+    def get(self, query):
+        pass
+
+    @login_required
+    def post(self):
+        pass
+
+
+class Semesters(Resource):
+
+    def get(self, query):
+        pass
+
+    @login_required
+    def post(self):
+        pass
+
+
+class UserHistories(Resource):
+    decorators = [login_required]
+
+    def get(self, query):
+        pass
+
+    def post(self):
+        pass
+
+
+class UserProfiles(Resource):
+    decorators = [login_required]
+
+    def get(self, query):
+        pass
+
+    def post(self):
+        pass
+
+
 api.add_resource(Courses, '/courses/<string:query>', endpoint='courses')
 
 
-app.secret_key = os.environ['SECRET_KEY']
+app.secret_key = app.config['SECRET_KEY']
 
 if __name__ == '__main__':
     app.run()

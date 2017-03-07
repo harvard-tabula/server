@@ -2,42 +2,25 @@ from . import db
 import datetime
 
 
-interests = db.Table('interests',
-     db.Column('user_profile_id', db.Integer, db.ForeignKey('user_profile.id')),  # NB: Beware of SQLAlchemy string representations
-     db.Column('interest_id', db.Integer, db.ForeignKey('interest.id'))
-)
+tags = db.Table('tags',
+                # NB: Beware of SQLAlchemy string representations
+                db.Column('user_profile_id', db.Integer, db.ForeignKey('user_profile.id')),
+                db.Column('tag_id', db.Integer, db.ForeignKey('tag.id'))
+                )
 
 
-class Interest(db.Model):
+class Tag(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String(255), unique=True)
+    name = db.Column(db.String(50), unique=True)
+    category = db.Column(db.String(20))
     description = db.Column(db.Text)
 
-    def __init__(self, name, description=None):
+    def __init__(self, name, category):
         self.name = name
-        self.description = description
+        self.category = category
 
     def __repr__(self):
-        return '<Interest {}>'.format(self.name)
-
-
-milestones = db.Table('milestones',
-    db.Column('milestone_id', db.Integer, db.ForeignKey('milestone.id')),
-    db.Column('user_profile_id', db.Integer, db.ForeignKey('user_profile.id')),
-)
-
-
-class Milestone(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String(255), unique=True)
-    description = db.Column(db.Text)
-
-    def __init__(self, name, description=None):
-        self.name = name
-        self.description = description
-
-    def __repr__(self):
-        return '<Milestone {}>'.format(self.name)
+        return '<Tag type={} name={}>'.format(self.category, self.name)
 
 
 class User(db.Model):
@@ -81,10 +64,8 @@ class UserProfile(db.Model):
     ethnicity = db.Column(db.String(20))
     years_coding = db.Column(db.Float)
     year = db.Column(db.String(4))
-    interests = db.relationship('Interest', secondary=interests,
+    tags = db.relationship('Tag', secondary=tags,
                                 backref=db.backref('user_profiles', lazy='dynamic'))
-    milestones = db.relationship('Milestone', secondary=milestones,
-                                 backref=db.backref('user_profiles'))
 
     def __init__(self, user_hash, concentration_id=None, year=None, years_coding=None, gender=None, ethnicity=None):
         self.user_hash = user_hash
