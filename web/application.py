@@ -1,5 +1,5 @@
 from . import app, db
-from .models import User, UserProfile, Course, Concentration, Tag
+from .models import User, UserProfile, Course, Concentration, Tag, UserHistory
 from flask import redirect, session, request
 from flask_restful import Resource, Api
 from flask_login import LoginManager, login_required, login_user, logout_user, current_user
@@ -154,13 +154,13 @@ class Profile(Resource):
 
     def __init__(self):
         self.parser = reqparse.RequestParser()
-        self.parser.add_argument("name", location="json")
-        self.parser.add_argument("gender", location="json")
+        self.parser.add_argument("name", location="json", type=str)
+        self.parser.add_argument("gender", location="json", type=str)
         self.parser.add_argument("tag_ids", location="json", type=list)
-        self.parser.add_argument("concentration", location="json")
-        self.parser.add_argument("ethnicity", location="json")
-        self.parser.add_argument("years_coding", location="json")
-        self.parser.add_argument("year", location="json")
+        self.parser.add_argument("concentration", location="json", type=str)
+        self.parser.add_argument("ethnicity", location="json", type=str)
+        self.parser.add_argument("years_coding", location="json", type=float)
+        self.parser.add_argument("year", location="json", type=int)
 
         self.user_hash = session['user_hash']
 
@@ -202,7 +202,7 @@ class Profile(Resource):
 
     def put(self):
 
-        user_profile = db.session.query(UserProfile).filter(UserProfile.user_hash == self.user_hash).first()
+        user_profile = db.session.query(UserProfile).filter(UserProfile.user_hash == self.user_hash).one_or_none()
         if not user_profile:
             return {
                 'state': 404,
@@ -216,19 +216,20 @@ class Profile(Resource):
             Concentration.name == args['concentration']
         ).one_or_none()
 
-        # Handle general profile data
-        # TODO Clean up logic with user_profile.update(...)
-        user_profile.gender = args['gender']
-        user_profile.ethnicity = args['ethnicity']
-        user_profile.years_coding = args['years_coding']
-        user_profile.year = args['year']
-
         # Handle tags
         user_profile.tags.clear()
         for tag_id in args['tag_ids']:
             user_profile.tags.append(
-                db.session.query(Tag).filter(Tag.id == tag_id).first()
+                db.session.query(Tag).filter(Tag.id == tag_id).one_or_none()
             )
+
+        user_profile.tags = [tag_id for tag_id in user_profile.tags if tag_id is not None]
+
+        # Handle general profile data
+        user_profile.gender = args['gender']
+        user_profile.ethnicity = args['ethnicity']
+        user_profile.years_coding = args['years_coding']
+        user_profile.year = args['year']
 
         db.session.commit()
         return {'state': 201, 'message': 'Successfully updated profile.'}
@@ -237,7 +238,18 @@ class Profile(Resource):
 class History(Resource):
     decorators = [login_required]
 
+    def __init__(self):
+        self.user_hash = session['user_hash']
+
     def get(self):
+
+        # user_history = db.session.query(UserHistory).filter(UserHistory.user_hash == self.user_hash).one_or_none()
+        # if not user_history:
+        #     return {
+        #         'state': 404,
+        #         'message': 'Could not find user\'s profile.'
+        #     }
+
         return {'state': 200, 'data': {}}
 
     def post(self, data):
@@ -252,7 +264,6 @@ api.add_resource(History, '/history')
 # STATELESS RESOURCES
 ###############################
 class AllCourses(Resource):
-
     decorators = [login_required]
 
     def __init__(self):
@@ -283,6 +294,7 @@ class AllCourses(Resource):
 
 
 class Courses(Resource):
+    decorators = [login_required]
 
     def get(self, course_id):
 
@@ -305,6 +317,7 @@ class Courses(Resource):
 
 
 class CourseSearch(Resource):
+    decorators = [login_required]
 
     def get(self, query):
 
@@ -341,31 +354,31 @@ api.add_resource(CourseSearch, '/coursesearch/<string:query>')
 
 
 class Tags(Resource):
+    decorators = [login_required]
 
     def get(self, query):
         pass
 
-    @login_required
     def post(self):
         pass
 
 
 class Concentrations(Resource):
+    decorators = [login_required]
 
     def get(self, query):
         pass
 
-    @login_required
     def post(self):
         pass
 
 
 class Semesters(Resource):
+    decorators = [login_required]
 
     def get(self, query):
         pass
 
-    @login_required
     def post(self):
         pass
 
@@ -388,8 +401,6 @@ class UserProfiles(Resource):
 
     def post(self):
         pass
-
-
 
 
 app.secret_key = app.config['SECRET_KEY']
