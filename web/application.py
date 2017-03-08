@@ -9,6 +9,7 @@ from .config import Auth
 import json
 import hashlib
 from collections import Counter
+from flask_restful import reqparse
 
 api = Api(app)
 
@@ -151,10 +152,20 @@ api.add_resource(Logout, '/logout')
 class Profile(Resource):
     decorators = [login_required]
 
+    def __init__(self):
+        self.parser = reqparse.RequestParser()
+        self.parser.add_argument("name", location="json")
+        self.parser.add_argument("gender", location="json")
+        self.parser.add_argument("tags", location="json")
+        self.parser.add_argument("concentration", location="json")
+        self.parser.add_argument("ethnicity", location="json")
+        self.parser.add_argument("years_coding", location="json")
+        self.parser.add_argument("year", location="json")
+        self.user_hash = session['user_hash']
+
     def get(self):
 
-        user_hash = session['user_hash']
-        user_profile = db.session.query(UserProfile).filter(UserProfile.user_hash == user_hash).first()
+        user_profile = db.session.query(UserProfile).filter(UserProfile.user_hash == self.user_hash).first()
         if not user_profile:
             return {
                 'state': 404,
@@ -179,9 +190,24 @@ class Profile(Resource):
 
         return result
 
-    def post(self, data):
-        # TODO
-        return {'state': 201, 'message': 'Successfully updated profile.', 'data': data}
+    def put(self):
+
+        user_profile = db.session.query(UserProfile).filter(UserProfile.user_hash == self.user_hash).first()
+        if not user_profile:
+            return {
+                'state': 404,
+                'message': 'Could not find user\'s profile.'
+            }
+
+        args = self.parser.parse_args()
+        user_profile.gender = args['gender']
+        user_profile.ethnicity = args['ethnicity']
+        user_profile.years_coding = args['years_coding']
+        user_profile.year = args['year']
+        db.session.commit()
+        # TODO tags, concentration
+
+        return {'state': 201, 'message': 'Successfully updated profile.', 'data': user_profile.__repr__()}
 
 
 class History(Resource):
