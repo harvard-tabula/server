@@ -80,8 +80,8 @@ def load_tags():
 
 
 if __name__ == '__main__':
-    db.drop_all()
-    db.create_all()
+    # db.drop_all()
+    # db.create_all()
 
     load_tags()
     load_concentrations('./data/departments.csv')

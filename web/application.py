@@ -1,6 +1,6 @@
 from . import app, db
 from .models import User, UserHistory, UserProfile, Course
-import os
+from math import ceil
 from flask import redirect, session, request
 from flask_restful import Resource, Api
 from flask_login import LoginManager, login_required, login_user, logout_user, current_user
@@ -140,9 +140,9 @@ class Logout(Resource):
         return redirect('https://www.tabula.life')
 
 
-api.add_resource(Login, '/login', endpoint='login')
-api.add_resource(OAuth2Callback, '/oauth2callback', endpoint='oauth2callback')
-api.add_resource(Logout, '/logout', endpoint='logout')
+api.add_resource(Login, '/login')
+api.add_resource(OAuth2Callback, '/oauth2callback')
+api.add_resource(Logout, '/logout')
 
 
 ###############################
@@ -152,24 +152,24 @@ class Profile(Resource):
     decorators = [login_required]
 
     def get(self):
-        return {'state': 200, 'data': {'UserProfile': True, 'UserHistory': True}}
+        return {'state': 200, 'data': {}}
 
     def post(self):
-        pass
+        return {'state': 201, 'message': 'Successfully updated profile.'}
 
 
 class History(Resource):
     decorators = [login_required]
 
     def get(self):
-        pass
+        return {'state': 200, 'data': {}}
 
-    def post(self):
-        pass
+    def post(self, data):
+        return {'state': 201, 'data': {'id': data}, 'message': 'Successfully updated profile.'}
 
 
-api.add_resource(Profile, '/profile', endpoint='profile')
-api.add_resource(UserHistory, '/history', endpoint='history')
+api.add_resource(Profile, '/profile')
+api.add_resource(History, '/history')
 
 
 ###############################
@@ -177,20 +177,48 @@ api.add_resource(UserHistory, '/history', endpoint='history')
 ###############################
 class Courses(Resource):
 
-    def get(self, query):
-        results = Course.query.filter(Course.name_short.like(query)).limit(5)
-        courses = []
-        for result in results:
-            courses.append({'catalogue_number': result.name_short,
-                            'title': result.name_long,
-                            'description': result.description
-                            })
+    def __init__(self):
+        self.page_size = 20
 
-        return {'state': 200, 'data': courses}
+    def get(self, page=1):
+        count = db.session.query(Course).count()
+        lix = (page - 1) * self.page_size + 1
+        if lix > count:
+            return {'state': 500, 'message': 'Out of courses'}
+        num_courses = min(self.page_size, count - lix)
+        rix = lix + num_courses - 1
+        courses = db.session.query(Course).filter(lix <= Course.id, Course.id <= rix)
+        result = {
+            'state': 200,
+            'message': 'Courses successfully retrieved.',
+            'data': []
+        }
+        for course in courses:
+            result['data'].append({'id': course.id,
+                                   'catalogue_number': course.name_short,
+                                   'title': course.name_long,
+                                   'description': course.description
+                                   })
+
+        return result
+
+        # results = Course.query.filter(Course.name_short.like(query)).limit(5)
+        # courses = []
+        # for result in results:
+        #     courses.append({'catalogue_number': result.name_short,
+        #                     'title': result.name_long,
+        #                     'description': result.description
+        #                     })
+        #
+        # return {'state': 200, 'data': courses}
 
     @login_required
     def post(self):
         pass
+
+# api.add_resource(Courses, '/courses', 'courses/<query>')
+api.add_resource(Courses, '/courses', '/courses/page/<int:page>')
+
 
 
 class Tags(Resource):
@@ -243,7 +271,6 @@ class UserProfiles(Resource):
         pass
 
 
-api.add_resource(Courses, '/courses/<string:query>', endpoint='courses')
 
 
 app.secret_key = app.config['SECRET_KEY']
