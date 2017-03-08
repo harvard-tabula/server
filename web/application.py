@@ -1,5 +1,5 @@
 from . import app, db
-from .models import User, UserProfile, Course
+from .models import User, UserProfile, Course, Concentration
 from flask import redirect, session, request
 from flask_restful import Resource, Api
 from flask_login import LoginManager, login_required, login_user, logout_user, current_user
@@ -161,6 +161,7 @@ class Profile(Resource):
         self.parser.add_argument("ethnicity", location="json")
         self.parser.add_argument("years_coding", location="json")
         self.parser.add_argument("year", location="json")
+
         self.user_hash = session['user_hash']
 
     def get(self):
@@ -180,7 +181,7 @@ class Profile(Resource):
                 'email': current_user.email,
                 'avatar': current_user.avatar,
                 'tags': user_profile.tags,
-                'concentration': user_profile.concentration,
+                'concentration': user_profile.concentration.name,
                 'gender': user_profile.gender,
                 'ethnicity': user_profile.ethnicity,
                 'years_coding': user_profile.years_coding,
@@ -200,14 +201,17 @@ class Profile(Resource):
             }
 
         args = self.parser.parse_args()
+        user_profile.concentration_id = db.session.query(Concentration.id).filter(
+            Concentration.name == args['concentration']
+        ).one_or_none()
         user_profile.gender = args['gender']
         user_profile.ethnicity = args['ethnicity']
         user_profile.years_coding = args['years_coding']
         user_profile.year = args['year']
         db.session.commit()
-        # TODO tags, concentration
+        # TODO tags
 
-        return {'state': 201, 'message': 'Successfully updated profile.', 'data': user_profile.__repr__()}
+        return {'state': 201, 'message': 'Successfully updated profile.'}
 
 
 class History(Resource):
