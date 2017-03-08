@@ -13,7 +13,6 @@ class Tag(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(50), unique=True)
     category = db.Column(db.String(20))
-    description = db.Column(db.Text)
 
     def __init__(self, name, category):
         self.name = name
@@ -65,7 +64,7 @@ class UserProfile(db.Model):
     years_coding = db.Column(db.Float)
     year = db.Column(db.String(4))
     tags = db.relationship('Tag', secondary=tags,
-                                backref=db.backref('user_profiles', lazy='dynamic'))
+                           backref=db.backref('user_profiles', lazy='dynamic'))
 
     def __init__(self, user_hash, concentration_id=None, year=None, years_coding=None, gender=None, ethnicity=None):
         self.user_hash = user_hash

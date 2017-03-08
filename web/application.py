@@ -1,5 +1,5 @@
 from . import app, db
-from .models import User, UserProfile, Course, Concentration
+from .models import User, UserProfile, Course, Concentration, Tag
 from flask import redirect, session, request
 from flask_restful import Resource, Api
 from flask_login import LoginManager, login_required, login_user, logout_user, current_user
@@ -156,7 +156,7 @@ class Profile(Resource):
         self.parser = reqparse.RequestParser()
         self.parser.add_argument("name", location="json")
         self.parser.add_argument("gender", location="json")
-        self.parser.add_argument("tags", location="json")
+        self.parser.add_argument("tag_ids", location="json", type=list)
         self.parser.add_argument("concentration", location="json")
         self.parser.add_argument("ethnicity", location="json")
         self.parser.add_argument("years_coding", location="json")
@@ -173,6 +173,15 @@ class Profile(Resource):
                 'message': 'Could not find user\'s profile.'
             }
 
+        tags = [
+            {
+                'id': tag.id,
+                'name': tag.name,
+                'category': tag.category
+            }
+            for tag in user_profile.tags
+        ]
+
         result = {
             'state': 200,
             'message': 'User Profile retrieved successfully.',
@@ -180,7 +189,7 @@ class Profile(Resource):
                 'name': current_user.name,
                 'email': current_user.email,
                 'avatar': current_user.avatar,
-                'tags': user_profile.tags,
+                'tags': tags,
                 'concentration': user_profile.concentration.name,
                 'gender': user_profile.gender,
                 'ethnicity': user_profile.ethnicity,
@@ -201,16 +210,27 @@ class Profile(Resource):
             }
 
         args = self.parser.parse_args()
+
+        # Handle concentration id <> name conversion
         user_profile.concentration_id = db.session.query(Concentration.id).filter(
             Concentration.name == args['concentration']
         ).one_or_none()
+
+        # Handle general profile data
+        # TODO Clean up logic with user_profile.update(...)
         user_profile.gender = args['gender']
         user_profile.ethnicity = args['ethnicity']
         user_profile.years_coding = args['years_coding']
         user_profile.year = args['year']
-        db.session.commit()
-        # TODO tags
 
+        # Handle tags
+        user_profile.tags.clear()
+        for tag_id in args['tag_ids']:
+            user_profile.tags.append(
+                db.session.query(Tag).filter(Tag.id == tag_id).first()
+            )
+
+        db.session.commit()
         return {'state': 201, 'message': 'Successfully updated profile.'}
 
 
