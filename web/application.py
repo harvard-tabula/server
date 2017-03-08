@@ -46,7 +46,7 @@ def get_user_hash(app_unique_id):
                                     bytes(app_unique_id, encoding='utf-8'),
                                     bytes(app.config['SALT'], encoding='utf-8'),
                                     100000)
-    return user_hash
+    return str(user_hash)
 
 
 class Login(Resource):
@@ -152,10 +152,36 @@ class Profile(Resource):
     decorators = [login_required]
 
     def get(self):
-        return {'state': 200, 'data': {}}
 
-    def post(self):
-        return {'state': 201, 'message': 'Successfully updated profile.'}
+        user_hash = session['user_hash']
+        user_profile = db.session.query(UserProfile).filter(UserProfile.user_hash == user_hash).first()
+        if not user_profile:
+            return {
+                'state': 404,
+                'message': 'Could not find user\'s profile.'
+            }
+
+        result = {
+            'state': 200,
+            'message': 'User Profile retrieved successfully.',
+            'data': {
+                'name': current_user.name,
+                'email': current_user.email,
+                'avatar': current_user.avatar,
+                'tags': user_profile.tags,
+                'concentration': user_profile.concentration,
+                'gender': user_profile.gender,
+                'ethnicity': user_profile.ethnicity,
+                'years_coding': user_profile.years_coding,
+                'year': user_profile.year
+            }
+        }
+
+        return result
+
+    def post(self, data):
+        # TODO
+        return {'state': 201, 'message': 'Successfully updated profile.', 'data': data}
 
 
 class History(Resource):

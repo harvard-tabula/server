@@ -3,7 +3,7 @@ import datetime
 
 
 tags = db.Table('tags',
-                # NB: Beware of SQLAlchemy string representations
+                # NB: Beware of SQLAlchemy string representations: UserProfile -> user_profile
                 db.Column('user_profile_id', db.Integer, db.ForeignKey('user_profile.id')),
                 db.Column('tag_id', db.Integer, db.ForeignKey('tag.id'))
                 )
