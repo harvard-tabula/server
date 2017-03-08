@@ -1,6 +1,5 @@
 from . import app, db
-from .models import User, UserHistory, UserProfile, Course
-from math import ceil
+from .models import User, UserProfile, Course
 from flask import redirect, session, request
 from flask_restful import Resource, Api
 from flask_login import LoginManager, login_required, login_user, logout_user, current_user
@@ -9,6 +8,7 @@ from requests.exceptions import HTTPError
 from .config import Auth
 import json
 import hashlib
+from collections import Counter
 
 api = Api(app)
 
@@ -175,7 +175,9 @@ api.add_resource(History, '/history')
 ###############################
 # STATELESS RESOURCES
 ###############################
-class Courses(Resource):
+class AllCourses(Resource):
+
+    decorators = [login_required]
 
     def __init__(self):
         self.page_size = 20
@@ -194,31 +196,72 @@ class Courses(Resource):
             'data': []
         }
         for course in courses:
-            result['data'].append({'id': course.id,
-                                   'catalogue_number': course.name_short,
-                                   'title': course.name_long,
-                                   'description': course.description
+            result['data'].append({
+                                    'id': course.id,
+                                    'catalogue_number': course.name_short,
+                                    'title': course.name_long,
+                                    'description': course.description
                                    })
 
         return result
 
-        # results = Course.query.filter(Course.name_short.like(query)).limit(5)
-        # courses = []
-        # for result in results:
-        #     courses.append({'catalogue_number': result.name_short,
-        #                     'title': result.name_long,
-        #                     'description': result.description
-        #                     })
-        #
-        # return {'state': 200, 'data': courses}
 
-    @login_required
-    def post(self):
-        pass
+class Courses(Resource):
 
-# api.add_resource(Courses, '/courses', 'courses/<query>')
-api.add_resource(Courses, '/courses', '/courses/page/<int:page>')
+    def get(self, course_id):
 
+        course = db.session.query(Course).filter(Course.id == course_id)
+
+        result = {
+            'state': 200,
+            'message': 'Course successfully retrieved.',
+            'data': []
+        }
+
+        result['data'].append({
+                                'id': course[0].id,
+                                'catalogue_number': course[0].name_short,
+                                'title': course[0].name_long,
+                                'description': course[0].description
+                               })
+
+        return result
+
+
+class CourseSearch(Resource):
+
+    def get(self, query):
+
+        tokens = query.split(' ')
+        courses = Counter()
+        for token in tokens:
+            res = db.session.query(Course).filter(
+                    Course.name_long.like('%{}%'.format(token)) |
+                    Course.name_short.like('%{}%'.format(token)) |
+                    Course.description.like('%{}%'.format(token))
+                    ).limit(20)
+            courses.update([course for course in res])
+
+        result = {
+            'state': 200,
+            'message': 'Courses successfully retrieved.',
+            'data': [
+                {
+                    'id': course.id,
+                    'catalogue_number': course.name_short,
+                    'title': course.name_long,
+                    'description': course.description
+                }
+                for course, rank in courses.most_common(10)
+            ]
+        }
+
+        return result
+
+
+api.add_resource(AllCourses, '/allcourses', '/allcourses/page/<int:page>')
+api.add_resource(Courses, '/courses/<int:course_id>')
+api.add_resource(CourseSearch, '/coursesearch/<string:query>')
 
 
 class Tags(Resource):
