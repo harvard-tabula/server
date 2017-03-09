@@ -1,5 +1,5 @@
 from . import app, db
-from .models import User, UserProfile, Course, Concentration, Tag, UserHistory
+from .models import User, UserProfile, Course, Concentration, Tag, UserHistory, Semester
 from flask import redirect, session, request
 from flask_restful import Resource, Api
 from flask_login import LoginManager, login_required, login_user, logout_user, current_user
@@ -218,18 +218,20 @@ class Profile(Resource):
 
         # Handle tags
         user_profile.tags.clear()
+        new_tags = []
         for tag_id in args['tag_ids']:
-            user_profile.tags.append(
+            new_tags.append(
                 db.session.query(Tag).filter(Tag.id == tag_id).one_or_none()
             )
 
-        user_profile.tags = [tag_id for tag_id in user_profile.tags if tag_id is not None]
+        user_profile.tags = [tag_id for tag_id in new_tags if tag_id is not None]
 
         # Handle general profile data
         user_profile.gender = args['gender']
         user_profile.ethnicity = args['ethnicity']
         user_profile.years_coding = args['years_coding']
         user_profile.year = args['year']
+        user_profile.name = args['name']
 
         db.session.commit()
         return {'state': 201, 'message': 'Successfully updated profile.'}
@@ -239,6 +241,11 @@ class History(Resource):
     decorators = [login_required]
 
     def __init__(self):
+        self.parser = reqparse.RequestParser()
+        self.parser.add_argument("semester", location="json", type=str)
+        self.parser.add_argument("grade", location="json", type=str)
+        self.parser.add_argument("id", location="json", type=int)
+
         self.user_hash = session['user_hash']
 
     def get(self):
@@ -262,8 +269,46 @@ class History(Resource):
 
         return {'state': 200, 'data': result}
 
-    def post(self, data):
-        return {'state': 201, 'data': {'id': data}, 'message': 'Successfully updated profile.'}
+    def put(self):
+
+        args = self.parser.parse_args()
+        user_history = db.session.query(UserHistory).filter(
+            UserHistory.user_hash == self.user_hash,
+            UserHistory.course_id == args['id']
+        ).one_or_none()
+
+        term, year = args['semester'].split(' ')
+        semester_id = db.session.query(Semester.id).filter(Semester.term == term, Semester.year == year).one_or_none()
+        if not semester_id:
+            return {'state': 404, 'message': 'Could not find semester ID.'}
+
+        if not user_history:  # Create
+            new_user_history = UserHistory(self.user_hash, args['id'], semester_id, args['grade'])
+            db.session.add(new_user_history)
+
+        else:  # Update
+            user_history.semester_id = semester_id
+            user_history.grade = args['grade']
+            user_history.course_id = args['id']
+
+        db.session.commit()
+
+        return {'state': 201, 'message': 'Successfully updated user_history.'}
+
+    def delete(self):
+
+        args = self.parser.parse_args()
+        user_history = db.session.query(UserHistory).filter(
+            UserHistory.user_hash == self.user_hash,
+            UserHistory.course_id == args['id']
+        ).one_or_none()
+
+        if not user_history:
+            return {'state': 404, 'message': 'No user_history to delete'}
+        else:
+            db.session.delete(user_history)
+            db.session.commit()
+            return {'state': 204, 'message': 'Deleted user_history for given course ID'}
 
 
 api.add_resource(Profile, '/profile')
