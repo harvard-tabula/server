@@ -115,8 +115,11 @@ class Course(db.Model):
 
 
 class UserHistory(db.Model):
+
+    constraint = db.UniqueConstraint('user_hash', 'course_id')
+
     id = db.Column(db.Integer, primary_key=True)
-    user_hash = db.Column(db.String(255), unique=True, nullable=False)
+    user_hash = db.Column(db.String(255), nullable=False)
     course_id = db.Column(db.Integer, db.ForeignKey('course.id'))
     semester_id = db.Column(db.Integer, db.ForeignKey('semester.id'))
     grade = db.Column(db.String(3))
@@ -141,11 +144,13 @@ class UserHistory(db.Model):
 
 class Semester(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String(15))
+    term = db.Column(db.String(6))
+    year = db.Column(db.String(4))
     course_histories = db.relationship('UserHistory', backref='semester')
 
-    def __init__(self, name):
-        self.name = name
+    def __init__(self, year, term):
+        self.year = year
+        self.term = term
 
     def __repr__(self):
-        return '<Semester {}>'.format(self.name)
+        return '<Semester {} {}>'.format(self.year, self.term)

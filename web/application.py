@@ -47,7 +47,7 @@ def get_user_hash(app_unique_id):
                                     bytes(app_unique_id, encoding='utf-8'),
                                     bytes(app.config['SALT'], encoding='utf-8'),
                                     100000)
-    return str(user_hash)
+    return user_hash.hex()
 
 
 class Login(Resource):
@@ -243,14 +243,24 @@ class History(Resource):
 
     def get(self):
 
-        # user_history = db.session.query(UserHistory).filter(UserHistory.user_hash == self.user_hash).one_or_none()
-        # if not user_history:
-        #     return {
-        #         'state': 404,
-        #         'message': 'Could not find user\'s profile.'
-        #     }
+        result = []
+        user_histories = db.session.query(UserHistory).filter(UserHistory.user_hash == self.user_hash).all()
+        for user_history in user_histories:
+            result.append({
+                'id': user_history.id,
+                'semester': "{} {}".format(user_history.semester.term, user_history.semester.year),
+                'grade': user_history.grade,
+                'course': {
+                    'id': user_history.course.id,
+                    'course_id': user_history.course.course_id,
+                    'name_short': user_history.course.name_short,
+                    'name_long': user_history.course.name_long,
+                    'description': user_history.course.description,
+                    'concentration': user_history.course.concentration.name
+                }
+            })
 
-        return {'state': 200, 'data': {}}
+        return {'state': 200, 'data': result}
 
     def post(self, data):
         return {'state': 201, 'data': {'id': data}, 'message': 'Successfully updated profile.'}

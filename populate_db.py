@@ -30,6 +30,16 @@ def load_concentrations(path):
     db.session.commit()
 
 
+def load_semesters():
+
+    semesters = [(year, term) for term in ['Fall', 'Spring'] for year in range(2010, 2030)]
+    for semester in semesters:
+        sem = models.Semester(semester[0], semester[1])
+        db.session.add(sem)
+
+    db.session.commit()
+
+
 def load_tags():
 
     tags = {
@@ -83,6 +93,7 @@ if __name__ == '__main__':
     # db.drop_all()
     # db.create_all()
 
-    load_tags()
-    load_concentrations('./data/departments.csv')
-    load_courses('./data/course_table.csv')
+    load_semesters()
+    # load_tags()
+    # load_concentrations('./data/departments.csv')
+    # load_courses('./data/course_table.csv')
