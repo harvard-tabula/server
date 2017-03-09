@@ -403,16 +403,21 @@ class CourseSearch(Resource):
         return result
 
 
-api.add_resource(AllCourses, '/allcourses', '/allcourses/page/<int:page>')
-api.add_resource(Courses, '/courses/<int:course_id>')
-api.add_resource(CourseSearch, '/coursesearch/<string:query>')
-
-
 class Tags(Resource):
     decorators = [login_required]
 
-    def get(self, query):
-        pass
+    def get(self):
+        tags = db.session.query(Tag).all()
+        result = [
+            {
+                "category": tag.category,
+                "id": tag.id,
+                "name": tag.name
+            }
+            for tag in tags
+        ]
+
+        return {'state': 200, 'message': 'Tags retrieved successfully', 'data': result}
 
     def post(self):
         pass
@@ -421,8 +426,17 @@ class Tags(Resource):
 class Concentrations(Resource):
     decorators = [login_required]
 
-    def get(self, query):
-        pass
+    def get(self):
+        concentrations = db.session.query(Concentration).all()
+        result = [
+            {
+                "id": concentration.id,
+                "name": concentration.name
+            }
+            for concentration in concentrations
+        ]
+
+        return {'state': 200, 'message': 'Tags retrieved successfully', 'data': result}
 
     def post(self):
         pass
@@ -431,8 +445,17 @@ class Concentrations(Resource):
 class Semesters(Resource):
     decorators = [login_required]
 
-    def get(self, query):
-        pass
+    def get(self):
+        semesters = db.session.query(Semester).all()
+        result = [
+            {
+                "id": semester.id,
+                "semester": '{} {}'.format(semester.term, semester.year)
+            }
+            for semester in semesters
+        ]
+
+        return {'state': 200, 'message': 'Tags retrieved successfully', 'data': result}
 
     def post(self):
         pass
@@ -456,6 +479,14 @@ class UserProfiles(Resource):
 
     def post(self):
         pass
+
+
+api.add_resource(AllCourses, '/allcourses', '/allcourses/page/<int:page>')
+api.add_resource(Courses, '/courses/<int:course_id>')
+api.add_resource(CourseSearch, '/coursesearch/<string:query>')
+api.add_resource(Tags, '/tags')
+api.add_resource(Concentrations, '/concentrations')
+api.add_resource(Semesters, '/semesters')
 
 
 app.secret_key = app.config['SECRET_KEY']
