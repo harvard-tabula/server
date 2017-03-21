@@ -18,7 +18,7 @@ services:
 
   data:
     restart: "no"
-    image: postgres:latest
+    image: postgres:9.6
     volumes:
       - .:/var/lib/postgresql
     command: "true"
@@ -30,3 +30,13 @@ services:
       - data
     ports:
       - "5432:5432"
+
+#  nginx:
+#    restart: always
+#    build: ./nginx/
+#    ports:
+#      - "80:80"
+#    volumes_from:
+#      - web
+#    links:
+#      - web:web
