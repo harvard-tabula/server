@@ -9,6 +9,7 @@ services:
       - '.env'
     ports:
       - "8080:8080"
+      - "443:8080"
     depends_on:
       - postgres
     volumes:
@@ -30,13 +31,3 @@ services:
       - data
     ports:
       - "5432:5432"
-
-#  nginx:
-#    restart: always
-#    build: ./nginx/
-#    ports:
-#      - "80:80"
-#    volumes_from:
-#      - web
-#    links:
-#      - web:web

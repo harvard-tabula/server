@@ -1,6 +1,6 @@
 from . import app, db
 from .models import User, UserProfile, Course, Concentration, Tag, UserHistory, Semester
-from flask import redirect, session, request
+from flask import redirect, session, request, make_response
 from flask_restful import Resource, Api
 from flask_login import LoginManager, login_required, login_user, logout_user, current_user
 from requests_oauthlib import OAuth2Session
@@ -132,13 +132,24 @@ class Logout(Resource):
 
     def get(self):
         if app.config['DEBUG']:
+            user = current_user
+            user.authenticated = False
             logout_user()
-            return {'state': 200, 'message': 'Successfully logged out.'}
+            resp = make_response(redirect('/'))
+            resp.set_cookie('session', value='', expires=0)
+            # return resp
+            return {}
         return {'state': 400, 'message': 'Logout requests must be made via post in production.'}
 
     def post(self):
+        user = current_user
+        user.authenticated = False
+        db.session.add(user)
+        db.session.commit()
         logout_user()
-        return redirect('https://www.tabula.life')
+        resp = make_response(redirect('/'))
+        resp.set_cookie('session', '', expires=0)
+        return resp
 
 
 api.add_resource(Login, '/login')
@@ -318,6 +329,12 @@ api.add_resource(History, '/history')
 ###############################
 # STATELESS RESOURCES
 ###############################
+class Test(Resource):
+
+    def get(self):
+        return {'state': 200, 'message': 'Ping!'}
+
+
 class AllCourses(Resource):
     decorators = [login_required]
 
@@ -481,6 +498,7 @@ class UserProfiles(Resource):
         pass
 
 
+api.add_resource(Test, '/')
 api.add_resource(AllCourses, '/allcourses', '/allcourses/page/<int:page>')
 api.add_resource(Courses, '/courses/<int:course_id>')
 api.add_resource(CourseSearch, '/coursesearch/<string:query>')
