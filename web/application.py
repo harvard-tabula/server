@@ -50,6 +50,12 @@ def get_user_hash(app_unique_id):
     return user_hash.hex()
 
 
+class Test(Resource):
+
+    def get(self):
+        return {'state': 200, 'message': 'response received!'} 
+
+
 class Login(Resource):
 
     def get(self):
@@ -141,6 +147,7 @@ class Logout(Resource):
         return redirect('https://www.tabula.life')
 
 
+api.add_resource(Test, '/')
 api.add_resource(Login, '/login')
 api.add_resource(OAuth2Callback, '/oauth2callback')
 api.add_resource(Logout, '/logout')
@@ -190,7 +197,7 @@ class Profile(Resource):
                 'email': current_user.email,
                 'avatar': current_user.avatar,
                 'tags': tags,
-                'concentration': user_profile.concentration.name,
+                'concentration': user_profile.concentration.name if user_profile.concentration else None,
                 'gender': user_profile.gender,
                 'ethnicity': user_profile.ethnicity,
                 'years_coding': user_profile.years_coding,
