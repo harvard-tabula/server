@@ -78,7 +78,14 @@ def load_tags():
         ('Built a server', 'milestone'),
         ('Built a web-app', 'milestone'),
         ('Created a model', 'milestone'),
-        ('Proof-Based Math', 'milestone')
+        ('Proof-Based Math', 'milestone'),
+        ('Love', 'user_history'),
+        ('Happy', 'user_history'),
+        ('Neutral', 'user_history'),
+        ('Sad', 'user_history'),
+        ('Angry', 'user_history'),
+        ('Difficult', 'user_history'),
+        ('Learning', 'user_history')
     }
 
     for tag in tags:
@@ -90,8 +97,17 @@ def load_tags():
 
 
 if __name__ == '__main__':
-    db.drop_all()
-    db.create_all()
+
+    """
+    This script should never be used to drop or create tables. That's what Alembic is for. (Plus versioning and whatnot.)
+
+    To get your DB to the correct state, run `python3 manage.py db upgrade` from the project directory.
+
+    If you make changes to the schema, update the DB by first running `python3 manage.py db migrate -m <useful message>`
+    before running the `upgrade` command again.
+
+    See http://alembic.zzzcomputing.com/en/latest/tutorial.html if you're confused.
+    """
     load_semesters()
     load_tags()
     load_concentrations('./data/departments.csv')

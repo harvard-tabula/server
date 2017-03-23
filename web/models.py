@@ -9,6 +9,12 @@ tags = db.Table('tags',
                 )
 
 
+course_tags = db.Table('course_tags',
+                       db.Column('user_history_id', db.Integer, db.ForeignKey('user_history.id')),
+                       db.Column('tag_id', db.Integer, db.ForeignKey('tag.id'))
+                       )
+
+
 class Tag(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(50), unique=True)
@@ -46,7 +52,7 @@ class User(db.Model):
 
     @property
     def is_authenticated(self):  # User is allowed to authenticate
-        return True
+        return True  # TODO Should this be the default value?
 
     def get_id(self):
         return str(self.id)
@@ -71,11 +77,11 @@ class UserProfile(db.Model):
         self.concentration_id = concentration_id
         self.year = year
         self.years_coding = years_coding
-        self.gender= gender
+        self.gender = gender
         self.ethnicity = ethnicity
 
     def __repr__(self):
-        return '<UserProfile {}>'.format(self.concentration)
+        return '<UserProfile id={}>'.format(self.id)
 
 
 class Concentration(db.Model):
@@ -91,55 +97,50 @@ class Concentration(db.Model):
         self.group_code = group_code
 
     def __repr__(self):
-        return '<{}>'.format(self.name)
+        return '<Concentration name={}>'.format(self.name)
 
 
 class Course(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    course_id = db.Column(db.Integer)           # e.g. 1452974
+    harvard_id = db.Column(db.Integer)     # e.g. 1452974
     name_short = db.Column(db.String(20))  # e.g. COMPSCI 164
     name_long = db.Column(db.String(255))  # e.g. Software Engineering
     description = db.Column(db.Text)
     course_histories = db.relationship('UserHistory',  backref='course')
     concentration_id = db.Column(db.Integer, db.ForeignKey('concentration.id'))
 
-    def __init__(self, course_id, name_short, name_long, description, concentration_id):
-        self.course_id = course_id
+    def __init__(self, harvard_id, name_short, name_long, description, concentration_id):
+        self.harvard_id = harvard_id
         self.name_short = name_short
         self.name_long = name_long
         self.description = description
         self.concentration_id = concentration_id
 
     def __repr__(self):
-        return '<Course {} - {}>'.format(self.course_id, self.name_short)
+        return '<Course name={}>'.format(self.name_short)
 
 
 class UserHistory(db.Model):
 
-    constraint = db.UniqueConstraint('user_hash', 'course_id')
-
+    constraint = db.UniqueConstraint('user_hash', 'course_id', 'semester_id')
     id = db.Column(db.Integer, primary_key=True)
     user_hash = db.Column(db.String(255), nullable=False)
     course_id = db.Column(db.Integer, db.ForeignKey('course.id'))
     semester_id = db.Column(db.Integer, db.ForeignKey('semester.id'))
     grade = db.Column(db.String(3))
     hours = db.Column(db.Float)
-    difficulty = db.Column(db.Integer)
-    learning = db.Column(db.Integer)
-    enjoyment = db.Column(db.Integer)
+    course_tags = db.relationship('Tag', secondary=course_tags,
+                           backref=db.backref('user_histories', lazy='dynamic'))
 
-    def __init__(self, user_hash, course_id, semester_id, grade, hours=None, difficulty=None, learning=None, enjoyment=None):
+    def __init__(self, user_hash, course_id, semester_id, grade, hours=None):
         self.user_hash = user_hash
         self.course_id = course_id
         self.semester_id = semester_id
         self.hours = hours
         self.grade = grade
-        self.difficulty = difficulty
-        self.learning = learning
-        self.enjoyment = enjoyment
 
     def __repr__(self):
-        return '<UserHistory {} {}>'.format(self.course_id, self.grade)
+        return '<UserHistory id={}>'.format(self.course_id)
 
 
 class Semester(db.Model):
@@ -153,4 +154,4 @@ class Semester(db.Model):
         self.term = term
 
     def __repr__(self):
-        return '<Semester {} {}>'.format(self.year, self.term)
+        return '<Semester term={} year={}>'.format(self.year, self.term)

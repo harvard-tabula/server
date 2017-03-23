@@ -283,15 +283,17 @@ class History(Resource):
     def put(self):
 
         args = self.parser.parse_args()
-        user_history = db.session.query(UserHistory).filter(
-            UserHistory.user_hash == self.user_hash,
-            UserHistory.course_id == args['id']
-        ).one_or_none()
 
         term, year = args['semester'].split(' ')
         semester_id = db.session.query(Semester.id).filter(Semester.term == term, Semester.year == year).one_or_none()
         if not semester_id:
             return {'state': 404, 'message': 'Could not find semester ID.'}
+
+        user_history = db.session.query(UserHistory).filter(
+            UserHistory.user_hash == self.user_hash,
+            UserHistory.course_id == args['id'],
+            UserHistory.semester_id == semester_id
+        ).one_or_none()
 
         if not user_history:  # Create
             new_user_history = UserHistory(self.user_hash, args['id'], semester_id, args['grade'])
