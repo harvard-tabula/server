@@ -201,7 +201,7 @@ class Profile(Resource):
                 'email': current_user.email,
                 'avatar': current_user.avatar,
                 'tags': tags,
-                'concentration': user_profile.concentration.name,
+                'concentration': user_profile.concentration.name if user_profile.concentration else None,
                 'gender': user_profile.gender,
                 'ethnicity': user_profile.ethnicity,
                 'years_coding': user_profile.years_coding,
@@ -256,6 +256,9 @@ class History(Resource):
         self.parser.add_argument("semester", location="json", type=str)
         self.parser.add_argument("grade", location="json", type=str)
         self.parser.add_argument("id", location="json", type=int)
+        self.parser.add_argument("hours", location="json", type=int)
+        self.parser.add_argument("course_tag_ids", location="json", type=list)
+
 
         self.user_hash = session['user_hash']
 
@@ -264,13 +267,25 @@ class History(Resource):
         result = []
         user_histories = db.session.query(UserHistory).filter(UserHistory.user_hash == self.user_hash).all()
         for user_history in user_histories:
+
+            course_tags = [
+                {
+                    'id': course_tag.id,
+                    'name': course_tag.name,
+                    'category': course_tag.category
+                }
+                for course_tag in user_history.course_tags
+            ]
+
             result.append({
                 'id': user_history.id,
                 'semester': "{} {}".format(user_history.semester.term, user_history.semester.year),
                 'grade': user_history.grade,
+                'course_tags': course_tags,
+                'hours': user_history.hours,
                 'course': {
                     'id': user_history.course.id,
-                    'course_id': user_history.course.course_id,
+                    'harvard_id': user_history.course.harvard_id,
                     'name_short': user_history.course.name_short,
                     'name_long': user_history.course.name_long,
                     'description': user_history.course.description,
@@ -296,13 +311,27 @@ class History(Resource):
         ).one_or_none()
 
         if not user_history:  # Create
-            new_user_history = UserHistory(self.user_hash, args['id'], semester_id, args['grade'])
-            db.session.add(new_user_history)
+            user_history = UserHistory(self.user_hash, args['id'], semester_id, args['grade'])
+            db.session.add(user_history)
 
         else:  # Update
             user_history.semester_id = semester_id
             user_history.grade = args['grade']
             user_history.course_id = args['id']
+
+        # Handle tags
+        if args.get('course_tag_ids'):
+            # import sys
+            # print('!', file=sys.stderr)
+            new_course_tags = []
+            for course_tag_id in args['course_tag_ids']:
+                new_course_tags.append(
+                    db.session.query(Tag).filter(Tag.id == course_tag_id).one_or_none()
+                )
+            user_history.course_tags.clear()
+            user_history.course_tags = [course_tag_id for course_tag_id in new_course_tags if course_tag_id is not None]
+
+        user_history.hours = args.get('hours')
 
         db.session.commit()
 
@@ -311,9 +340,16 @@ class History(Resource):
     def delete(self):
 
         args = self.parser.parse_args()
+
+        term, year = args['semester'].split(' ')
+        semester_id = db.session.query(Semester.id).filter(Semester.term == term, Semester.year == year).one_or_none()
+        if not semester_id:
+            return {'state': 404, 'message': 'Could not find semester ID.'}
+
         user_history = db.session.query(UserHistory).filter(
             UserHistory.user_hash == self.user_hash,
-            UserHistory.course_id == args['id']
+            UserHistory.course_id == args['id'],
+            UserHistory.semester_id == semester_id
         ).one_or_none()
 
         if not user_history:

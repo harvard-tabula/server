@@ -128,7 +128,7 @@ class UserHistory(db.Model):
     course_id = db.Column(db.Integer, db.ForeignKey('course.id'))
     semester_id = db.Column(db.Integer, db.ForeignKey('semester.id'))
     grade = db.Column(db.String(3))
-    hours = db.Column(db.Float)
+    hours = db.Column(db.Integer)
     course_tags = db.relationship('Tag', secondary=course_tags,
                            backref=db.backref('user_histories', lazy='dynamic'))
 
