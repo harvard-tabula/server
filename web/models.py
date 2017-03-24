@@ -1,6 +1,54 @@
 from . import db
 import datetime
 
+# Support for ENUMs between sqlalchemy, alembic, postgres is dodgy at best. Easier to do validation server-side.
+
+Gender = {
+    "Male",
+    "Female",
+    "Other"
+}
+
+Term = {
+    "Spring",
+    "Fall",
+    "Summer",
+    "Winter",
+}
+
+Grade = {
+    "A",
+    "A-",
+    "B+",
+    "B",
+    "B-",
+    "C+",
+    "C",
+    "C-",
+    "D+",
+    "D",
+    "D-",
+    "E+",
+    "E",
+    "E-",
+    "F+",
+    "F",
+    "SAT",
+    "UNSAT",
+    "W",
+    "P",
+    "F",
+}
+
+Ethnicity = {
+    "White",
+    "Black",
+    "Asian",
+    "South Asian",
+    "Latinx",
+    "Other",
+}
+
 
 tags = db.Table('tags',
                 # NB: Beware of SQLAlchemy string representations: UserProfile -> user_profile
@@ -65,11 +113,11 @@ class UserProfile(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     user_hash = db.Column(db.String(255), unique=True, nullable=False)
     concentration_id = db.Column(db.Integer, db.ForeignKey('concentration.id'))
-    gender = db.Column(db.String(10))
-    ethnicity = db.Column(db.String(20))
+    gender = db.Column(db.String(6))
+    ethnicity = db.Column(db.String(15))
     years_coding = db.Column(db.Float)
     year = db.Column(db.String(4))
-    tags = db.relationship('Tag', secondary=tags,
+    tags = db.relationship('Tag', secondary=tags, cascade="all",
                            backref=db.backref('user_profiles', lazy='dynamic'))
 
     def __init__(self, user_hash, concentration_id=None, year=None, years_coding=None, gender=None, ethnicity=None):
@@ -127,9 +175,9 @@ class UserHistory(db.Model):
     user_hash = db.Column(db.String(255), nullable=False)
     course_id = db.Column(db.Integer, db.ForeignKey('course.id'))
     semester_id = db.Column(db.Integer, db.ForeignKey('semester.id'))
-    grade = db.Column(db.String(3))
+    grade = db.Column(db.String(5))
     hours = db.Column(db.Integer)
-    course_tags = db.relationship('Tag', secondary=course_tags,
+    course_tags = db.relationship('Tag', secondary=course_tags, cascade="all",
                            backref=db.backref('user_histories', lazy='dynamic'))
 
     def __init__(self, user_hash, course_id, semester_id, grade, hours=None):

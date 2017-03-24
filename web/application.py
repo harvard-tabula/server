@@ -1,5 +1,5 @@
 from . import app, db
-from .models import User, UserProfile, Course, Concentration, Tag, UserHistory, Semester
+from .models import User, UserProfile, Course, Concentration, Tag, UserHistory, Semester, Gender, Ethnicity, Grade, Term
 from flask import redirect, session, request, make_response
 from flask_restful import Resource, Api
 from flask_login import LoginManager, login_required, login_user, logout_user, current_user
@@ -238,8 +238,18 @@ class Profile(Resource):
         user_profile.tags = [tag_id for tag_id in new_tags if tag_id is not None]
 
         # Handle general profile data
-        user_profile.gender = args['gender']
-        user_profile.ethnicity = args['ethnicity']
+        if args.get('gender'):
+            if args['gender'] in Gender:
+                user_profile.gender = args['gender']
+            else:
+                return {'state': 400, 'message': 'Not a valid gender'}
+
+        if args.get('ethnicity'):
+            if args['ethnicity'] in Ethnicity:
+                user_profile.ethnicity = args['ethnicity']
+            else:
+                return {'state': 400, 'message': 'Not a valid ethnicity'}
+
         user_profile.years_coding = args['years_coding']
         user_profile.year = args['year']
         user_profile.name = args['name']
@@ -300,6 +310,9 @@ class History(Resource):
         args = self.parser.parse_args()
 
         term, year = args['semester'].split(' ')
+        if term not in Term:
+            return {'state': 404, 'message': 'Invalid term'}
+
         semester_id = db.session.query(Semester.id).filter(Semester.term == term, Semester.year == year).one_or_none()
         if not semester_id:
             return {'state': 404, 'message': 'Could not find semester ID.'}
@@ -310,19 +323,24 @@ class History(Resource):
             UserHistory.semester_id == semester_id
         ).one_or_none()
 
+        grade = None
+        if args.get('grade'):
+            if args['grade'] in Grade:
+                grade = args['grade']
+            else:
+                return {'state': 400, 'message': 'Not a valid grade'}
+
         if not user_history:  # Create
-            user_history = UserHistory(self.user_hash, args['id'], semester_id, args['grade'])
+            user_history = UserHistory(self.user_hash, args['id'], semester_id, grade)
             db.session.add(user_history)
 
         else:  # Update
             user_history.semester_id = semester_id
-            user_history.grade = args['grade']
+            user_history.grade = grade
             user_history.course_id = args['id']
 
         # Handle tags
         if args.get('course_tag_ids'):
-            # import sys
-            # print('!', file=sys.stderr)
             new_course_tags = []
             for course_tag_id in args['course_tag_ids']:
                 new_course_tags.append(
@@ -342,6 +360,8 @@ class History(Resource):
         args = self.parser.parse_args()
 
         term, year = args['semester'].split(' ')
+        if term not in Term:
+            return {'state': 404, 'message': 'Invalid term'}
         semester_id = db.session.query(Semester.id).filter(Semester.term == term, Semester.year == year).one_or_none()
         if not semester_id:
             return {'state': 404, 'message': 'Could not find semester ID.'}
