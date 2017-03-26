@@ -1,0 +1,19 @@
+server {
+
+    listen 8080;
+    listen 80;
+    server_name tabula.life;
+    charset utf-8;
+
+    #listen 443;
+    #ssl on;
+    #ssl_certificate         /certs/certificate.pem;
+    #ssl_certificate_key     /certs/key.key;
+
+    location / {
+        proxy_pass http://web:8000;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+    }
+}
