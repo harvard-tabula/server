@@ -1,4 +1,4 @@
-from . import db
+from web import db
 import datetime
 
 # Support for ENUMs between sqlalchemy, alembic, postgres is dodgy at best. Easier to do validation server-side.

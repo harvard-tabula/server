@@ -1,11 +1,11 @@
-from . import app, db
-from .models import User, UserProfile, Course, Concentration, Tag, UserHistory, Semester, Gender, Ethnicity, Grade, Term
+from web import app, db
+from web.models import User, UserProfile, Course, Concentration, Tag, UserHistory, Semester, Gender, Ethnicity, Grade, Term
 from flask import redirect, session, request, make_response
 from flask_restful import Resource, Api
 from flask_login import LoginManager, login_required, login_user, logout_user, current_user
 from requests_oauthlib import OAuth2Session
 from requests.exceptions import HTTPError
-from .config import Auth
+from web.config import Auth
 import json
 import hashlib
 from collections import Counter
