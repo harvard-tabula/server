@@ -50,12 +50,6 @@ def get_user_hash(app_unique_id):
     return user_hash.hex()
 
 
-class Test(Resource):
-
-    def get(self):
-        return {'state': 200, 'message': 'response received!'} 
-
-
 class Login(Resource):
 
     def get(self):

@@ -20,5 +20,5 @@ EXPOSE 80
 EXPOSE 8080
 EXPOSE 443
 
-CMD ["uwsgi", "--socket", "0.0.0.0:8000", "--protocol=http", "--wsgi-file", "/var/www/web/application.py", "--callable", "app", "--logto", "/tmp/mylog.log"]
+CMD ["uwsgi", "--socket", "0.0.0.0:8000", "--protocol=http", "--wsgi-file", "/var/www/web/application.py", "--callable", "app", "--logto", "/var/log/uwsgi.log"]
 # CMD ["nginx"]
