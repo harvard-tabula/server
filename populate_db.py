@@ -97,10 +97,6 @@ def load_tags():
 
 
 if __name__ == '__main__':
-<<<<<<< HEAD
-    db.drop_all()
-    db.create_all()
-=======
 
     """
     This script should never be used to drop or create tables. That's what Alembic is for. (Plus versioning and whatnot.)
@@ -112,7 +108,6 @@ if __name__ == '__main__':
 
     See http://alembic.zzzcomputing.com/en/latest/tutorial.html if you're confused.
     """
->>>>>>> 0c46f4e766aca39d9c9b0057b0c2a0f1672a1350
     load_semesters()
     load_tags()
     load_concentrations('./data/departments.csv')
