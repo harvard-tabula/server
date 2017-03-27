@@ -5,10 +5,12 @@ server {
     server_name tabula.life;
     charset utf-8;
 
-    #listen 443;
-    #ssl on;
-    #ssl_certificate         /certs/certificate.pem;
-    #ssl_certificate_key     /certs/key.key;
+    listen 443 default ssl;
+    ssl_certificate         /certs/certificate.pem;
+    ssl_certificate_key     /certs/key.key;
+
+    # Force SSL on all connections
+    # ssl on;
 
     location / {
         proxy_pass http://web:8000;
