@@ -32,7 +32,7 @@ def load_concentrations(path):
 
 def load_semesters():
 
-    semesters = [(year, term) for term in ['Fall', 'Spring'] for year in range(2010, 2030)]
+    semesters = [(year, term) for term in ['Fall', 'Spring'] for year in range(2004, 2030)]
     for semester in semesters:
         sem = models.Semester(semester[0], semester[1])
         db.session.add(sem)
@@ -78,7 +78,14 @@ def load_tags():
         ('Built a server', 'milestone'),
         ('Built a web-app', 'milestone'),
         ('Created a model', 'milestone'),
-        ('Proof-Based Math', 'milestone')
+        ('Proof-Based Math', 'milestone'),
+        ('Love', 'user_history'),
+        ('Happy', 'user_history'),
+        ('Neutral', 'user_history'),
+        ('Sad', 'user_history'),
+        ('Angry', 'user_history'),
+        ('Difficult', 'user_history'),
+        ('Learning', 'user_history')
     }
 
     for tag in tags:
@@ -90,8 +97,22 @@ def load_tags():
 
 
 if __name__ == '__main__':
+<<<<<<< HEAD
     db.drop_all()
     db.create_all()
+=======
+
+    """
+    This script should never be used to drop or create tables. That's what Alembic is for. (Plus versioning and whatnot.)
+
+    To get your DB to the correct state, run `python3 manage.py db upgrade` from the project directory.
+
+    If you make changes to the schema, update the DB by first running `python3 manage.py db migrate -m <useful message>`
+    before running the `upgrade` command again.
+
+    See http://alembic.zzzcomputing.com/en/latest/tutorial.html if you're confused.
+    """
+>>>>>>> 0c46f4e766aca39d9c9b0057b0c2a0f1672a1350
     load_semesters()
     load_tags()
     load_concentrations('./data/departments.csv')
