@@ -152,7 +152,6 @@ class Logout(Resource):
         return resp
 
 
-api.add_resource(Test, '/')
 api.add_resource(Login, '/login')
 api.add_resource(OAuth2Callback, '/oauth2callback')
 api.add_resource(Logout, '/logout')
@@ -388,7 +387,7 @@ api.add_resource(History, '/history')
 ###############################
 # STATELESS RESOURCES
 ###############################
-class Test(Resource):
+class Ping(Resource):
 
     def get(self):
         return {'state': 200, 'message': 'Ping!'}
@@ -557,7 +556,7 @@ class UserProfiles(Resource):
         pass
 
 
-api.add_resource(Test, '/')
+api.add_resource(Ping, '/')
 api.add_resource(AllCourses, '/allcourses', '/allcourses/page/<int:page>')
 api.add_resource(Courses, '/courses/<int:course_id>')
 api.add_resource(CourseSearch, '/coursesearch/<string:query>')

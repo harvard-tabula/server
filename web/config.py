@@ -21,7 +21,7 @@ class Config(object):
 class Auth:
     CLIENT_SECRET = os.environ['GOOGLE_CLIENT_SECRET']
     CLIENT_ID = os.environ['GOOGLE_CLIENT_ID']
-    REDIRECT_URI = 'https://api.tabula.life/oauth2callback'
+    REDIRECT_URI = 'https://api.tabula.life/oauth2callback' 
     AUTH_URI = 'https://accounts.google.com/o/oauth2/auth'
     TOKEN_URI = 'https://accounts.google.com/o/oauth2/token'
     USER_INFO = 'https://www.googleapis.com/userinfo/v2/me'
