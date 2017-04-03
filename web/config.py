@@ -10,12 +10,12 @@ class Config(object):
     SQLALCHEMY_DATABASE_URI = 'postgresql+psycopg2://{}:{}@{}:{}/{}'.format(
         os.environ['DB_USER'],
         os.environ['DB_PASS'],
-        os.environ['DB_ALIAS'],
+        os.environ['DB_HOST'],
         os.environ['DB_PORT'],
         os.environ['DB_NAME']
     )
     SQLALCHEMY_TRACK_MODIFICATIONS = True
-    SALT = 'nevergettingbacktogether'  # TODO os.environ['SALT'] requires rebuild
+    SALT = os.environ['SALT']
 
 
 class Auth:

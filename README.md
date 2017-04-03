@@ -15,6 +15,10 @@ docker-compose up
 # start container, run bash instead of default CMD
 docker-compose run --rm web bash
 ```
+# Prod tips
+* Remember to use the prod docker-compose file. 
+* Reminder to update your .env file, and to enforce SSL with nginx.
+
 
 # Development tips
 * It's pretty convenient to test the API in your browser when developing locally. To do this you'll need to set an alias for `tabula.life` in `/etc/hosts` and then hit the API at `tabula.life:8080/<route>`. This is a bit of a hack around the domain's Google allows you to redirect the user to after receiving oauth.
