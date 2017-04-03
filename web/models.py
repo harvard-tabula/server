@@ -50,6 +50,15 @@ Ethnicity = {
 }
 
 
+Categories = [
+    {"text": "Academic Interests", "category": "academic"},
+    {"text": "Professional Interests", "category": "professional"},
+    {"text": "Milestones", "category": "milestone"},
+    {"text": "Languages", "category": "language"},
+    {"text": "Class Experience", "category": "user_history"},
+  ]
+
+
 tags = db.Table('tags',
                 # NB: Beware of SQLAlchemy string representations: UserProfile -> user_profile
                 db.Column('user_profile_id', db.Integer, db.ForeignKey('user_profile.id')),
@@ -138,11 +147,13 @@ class Concentration(db.Model):
     group_code = db.Column(db.String(30))
     user_profiles = db.relationship('UserProfile', backref='concentration')
     courses = db.relationship('Course', backref='concentration')
+    synonym = db.Column(db.String(4))
 
-    def __init__(self, dpt_id, name, group_code):
+    def __init__(self, dpt_id, name, group_code, synonym=None):
         self.id = dpt_id
         self.name = name
         self.group_code = group_code
+        self.synonym = synonym
 
     def __repr__(self):
         return '<Concentration name={}>'.format(self.name)

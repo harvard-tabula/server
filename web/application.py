@@ -1,7 +1,7 @@
 from web import app, db
-from web.models import User, UserProfile, Course, Concentration, Tag, UserHistory, Semester, Gender, Ethnicity, Grade, Term
+from web.models import User, UserProfile, Course, Concentration, Tag, UserHistory, Semester, Gender, Ethnicity, Grade, Term, Categories
 from flask import redirect, session, request, make_response
-from flask_restful import Resource, Api
+from flask_restful import Resource, Api, reqparse
 from flask_login import LoginManager, login_required, login_user, logout_user, current_user
 from requests_oauthlib import OAuth2Session
 from requests.exceptions import HTTPError
@@ -9,7 +9,6 @@ from web.config import Auth
 import json
 import hashlib
 from collections import Counter
-from flask_restful import reqparse
 
 api = Api(app)
 
@@ -50,24 +49,35 @@ def get_user_hash(app_unique_id):
     return user_hash.hex()
 
 
+authenticated_redirect = {
+    'state': 302,
+    'message': 'User is authenticated. Please manually redirect',
+    'redirect': 'https://www.tabula.life/user'
+}
+
+
 class Login(Resource):
 
     def get(self):
         if current_user.is_authenticated:
-            return redirect('/profile')
+            return authenticated_redirect
         google = get_google_auth()
         auth_url, state = google.authorization_url(
             Auth.AUTH_URI, access_type='offline', hd='college.harvard.edu')
         session['oauth_state'] = state
-        return redirect(auth_url)
+        return {
+            'state': 302,
+            'message': 'The browser must be manually redirected',
+            'redirect': auth_url
+        }
 
 
 class OAuth2Callback(Resource):
 
     def get(self):
 
-        if current_user is not None and current_user.is_authenticated:  # TODO Hash stored in session?
-            return redirect('profile')
+        if current_user is not None and current_user.is_authenticated:
+            return authenticated_redirect
 
         if 'error' in request.args:
             if request.args.get('error') == 'access_denied':
@@ -121,7 +131,7 @@ class OAuth2Callback(Resource):
 
                 login_user(user, remember=False)
 
-                return redirect('profile')
+                return authenticated_redirect
 
             return {'state': 500, 'message': 'Unable to authenticate token.'}
 
@@ -130,26 +140,13 @@ class Logout(Resource):
 
     decorators = [login_required]
 
-    def get(self):
-        if app.config['DEBUG']:
-            user = current_user
-            user.authenticated = False
-            logout_user()
-            resp = make_response(redirect('/'))
-            resp.set_cookie('session', value='', expires=0)
-            # return resp
-            return {}
-        return {'state': 400, 'message': 'Logout requests must be made via post in production.'}
-
+    # TODO Is there a way to flush the client's cookies?
     def post(self):
         user = current_user
         user.authenticated = False
-        db.session.add(user)
         db.session.commit()
         logout_user()
-        resp = make_response(redirect('/'))
-        resp.set_cookie('session', '', expires=0)
-        return resp
+        return {}
 
 
 api.add_resource(Login, '/login')
@@ -164,11 +161,13 @@ class Profile(Resource):
     decorators = [login_required]
 
     def __init__(self):
+
+        # TODO Is there a way to pull this information from somewhere else (e.g. model) to increase modularity?
         self.parser = reqparse.RequestParser()
         self.parser.add_argument("name", location="json", type=str)
         self.parser.add_argument("gender", location="json", type=str)
         self.parser.add_argument("tag_ids", location="json", type=list)
-        self.parser.add_argument("concentration", location="json", type=str)
+        self.parser.add_argument("concentration_id", location="json", type=int)
         self.parser.add_argument("ethnicity", location="json", type=str)
         self.parser.add_argument("years_coding", location="json", type=float)
         self.parser.add_argument("year", location="json", type=int)
@@ -177,21 +176,28 @@ class Profile(Resource):
 
     def get(self):
 
-        user_profile = db.session.query(UserProfile).filter(UserProfile.user_hash == self.user_hash).first()
-        if not user_profile:
+        user_profile = db.session.query(UserProfile).filter(UserProfile.user_hash == self.user_hash).one_or_none()
+        if not user_profile:  # TODO Add logging here, since this should really never happen.
             return {
-                'state': 404,
+                'state': 500,
                 'message': 'Could not find user\'s profile.'
             }
 
-        tags = [
+        tags = [  # Currently leaving out tag.description, since we've not populated that in the DB
             {
                 'id': tag.id,
                 'name': tag.name,
-                'category': tag.category
+                'category': tag.category,
             }
             for tag in user_profile.tags
         ]
+
+        concentration = None
+        if user_profile.concentration:
+            concentration = {
+                'id': user_profile.concentration.id,
+                'name': user_profile.concentration.name,
+            }
 
         result = {
             'state': 200,
@@ -201,7 +207,7 @@ class Profile(Resource):
                 'email': current_user.email,
                 'avatar': current_user.avatar,
                 'tags': tags,
-                'concentration': user_profile.concentration.name if user_profile.concentration else None,
+                'concentration': concentration,
                 'gender': user_profile.gender,
                 'ethnicity': user_profile.ethnicity,
                 'years_coding': user_profile.years_coding,
@@ -214,28 +220,17 @@ class Profile(Resource):
     def put(self):
 
         user_profile = db.session.query(UserProfile).filter(UserProfile.user_hash == self.user_hash).one_or_none()
-        if not user_profile:
+        if not user_profile:  # TODO Add logging here, since this should really never happen.
             return {
-                'state': 404,
+                'state': 500,
                 'message': 'Could not find user\'s profile.'
             }
 
         args = self.parser.parse_args()
 
-        # Handle concentration id <> name conversion
-        user_profile.concentration_id = db.session.query(Concentration.id).filter(
-            Concentration.name == args['concentration']
-        ).one_or_none()
-
-        # Handle tags
-        user_profile.tags.clear()
-        new_tags = []
-        for tag_id in args['tag_ids']:
-            new_tags.append(
-                db.session.query(Tag).filter(Tag.id == tag_id).one_or_none()
-            )
-
-        user_profile.tags = [tag_id for tag_id in new_tags if tag_id is not None]
+        # TODO Currently failing silently without notifying the user
+        user_profile.concentration_id = args['concentration_id']
+        user_profile.tags = db.session.query(Tag).filter(Tag.id.in_(args['tag_ids'])).all()
 
         # Handle general profile data
         if args.get('gender'):
@@ -403,10 +398,10 @@ class AllCourses(Resource):
         count = db.session.query(Course).count()
         lix = (page - 1) * self.page_size + 1
         if lix > count:
-            return {'state': 500, 'message': 'Out of courses'}
+            return {'state': 404, 'message': 'Out of courses'}
         num_courses = min(self.page_size, count - lix)
         rix = lix + num_courses - 1
-        courses = db.session.query(Course).filter(lix <= Course.id, Course.id <= rix)
+        courses = db.session.query(Course).filter(lix <= Course.id, Course.id <= rix).all()
         result = {
             'state': 200,
             'message': 'Courses successfully retrieved.',
@@ -428,7 +423,10 @@ class Courses(Resource):
 
     def get(self, course_id):
 
-        course = db.session.query(Course).filter(Course.id == course_id)
+        course = db.session.query(Course).filter(Course.id == course_id).one_or_none()
+
+        if not course:
+            return {'state': 404, 'message': 'No course with that ID'}
 
         result = {
             'state': 200,
@@ -436,22 +434,33 @@ class Courses(Resource):
             'data': []
         }
 
+        # Note: Because the other endpoints return resource relevant data in an array, I'm keeping the standard here.
         result['data'].append({
-                                'id': course[0].id,
-                                'catalogue_number': course[0].name_short,
-                                'title': course[0].name_long,
-                                'description': course[0].description
+                                'id': course.id,
+                                'catalogue_number': course.name_short,
+                                'title': course.name_long,
+                                'description': course.description
                                })
 
         return result
 
 
-class CourseSearch(Resource):
+class CourseSearch(Resource):  # TODO Search against concentration.synonym
     decorators = [login_required]
 
     def get(self, query):
 
+        alias_map = {
+            'CS': 'COMPSCI',
+            'AM': 'APMTH',
+            'ES': 'ENG-SCI',
+        }
+
         tokens = query.split(' ')
+        for i, token in enumerate(tokens):
+            if token in alias_map:
+                tokens[i] = alias_map[token]
+
         courses = Counter()
         for token in tokens:
             res = db.session.query(Course).filter(
@@ -536,24 +545,22 @@ class Semesters(Resource):
         pass
 
 
-class UserHistories(Resource):
+class UI(Resource):
     decorators = [login_required]
 
-    def get(self, query):
-        pass
+    def get(self):
 
-    def post(self):
-        pass
-
-
-class UserProfiles(Resource):
-    decorators = [login_required]
-
-    def get(self, query):
-        pass
-
-    def post(self):
-        pass
+        return {
+            'state': 200,
+            'message': 'Fields retrieved successfully',
+            'data': {
+                'ethnicities': list(Ethnicity),
+                'genders': list(Gender),
+                'grades': list(Grade),
+                'terms': list(Term),
+                'tags_categories': Categories
+            }
+        }
 
 
 api.add_resource(Ping, '/')
@@ -563,9 +570,8 @@ api.add_resource(CourseSearch, '/coursesearch/<string:query>')
 api.add_resource(Tags, '/tags')
 api.add_resource(Concentrations, '/concentrations')
 api.add_resource(Semesters, '/semesters')
+api.add_resource(UI, '/ui')
 
-
-app.secret_key = app.config['SECRET_KEY']
 
 if __name__ == '__main__':
     app.run()

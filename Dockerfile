@@ -17,8 +17,6 @@ COPY key.key /certs/key.key
 RUN rm certificate.pem; rm key.key
 
 EXPOSE 80
-EXPOSE 8080
 EXPOSE 443
 
 CMD ["uwsgi", "--socket", "0.0.0.0:8000", "--protocol=http", "--wsgi-file", "/var/www/web/application.py", "--callable", "app", "--logto", "/var/log/uwsgi.log", "--py-autoreload", "1"]
-# CMD ["nginx"]

@@ -17,7 +17,7 @@ def load_courses(path):
     db.session.commit()
 
 
-def load_concentrations(path):
+def load_departments(path):
     with open(path, encoding='latin') as f:
         f.readline()
         reader = csv.reader(f)
@@ -25,7 +25,8 @@ def load_concentrations(path):
             dpt_id = int(row[0])
             name = row[1]
             group_code = row[2]
-            course = models.Concentration(dpt_id, name, group_code)
+            synonym = row[3] if row[3] else None
+            course = models.Concentration(dpt_id, name, group_code, synonym)
             db.session.add(course)
     db.session.commit()
 
@@ -110,5 +111,5 @@ if __name__ == '__main__':
     """
     load_semesters()
     load_tags()
-    load_concentrations('./data/departments.csv')
+    load_departments('./data/departments.csv')
     load_courses('./data/course_table.csv')
