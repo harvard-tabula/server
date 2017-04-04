@@ -15,7 +15,7 @@ class Config(object):
         os.environ['DB_NAME']
     )
     SQLALCHEMY_TRACK_MODIFICATIONS = True
-    SALT = 'nevergettingbacktogether'  # TODO os.environ['SALT'] requires rebuild
+    SALT = os.environ['SALT']
 
 
 class Auth:
