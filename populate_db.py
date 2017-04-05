@@ -109,7 +109,8 @@ if __name__ == '__main__':
 
     See http://alembic.zzzcomputing.com/en/latest/tutorial.html if you're confused.
     """
-    load_semesters()
-    load_tags()
-    load_departments('./data/departments.csv')
-    load_courses('./data/course_table.csv')
+    with app.app_context():
+        load_semesters()
+        load_tags()
+        load_departments('./data/departments.csv')
+        load_courses('./data/course_table.csv')

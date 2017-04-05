@@ -386,12 +386,6 @@ api.add_resource(History, '/history')
 ###############################
 # STATELESS RESOURCES
 ###############################
-class Ping(Resource):
-
-    def get(self):
-        return {'state': 200, 'message': 'Ping!'}
-
-
 class AllCourses(Resource):
     decorators = [login_required]
 
@@ -565,6 +559,12 @@ class UI(Resource):
                 'tags_categories': Categories
             }
         }
+
+
+class Ping(Resource):
+
+    def get(self):
+        return {'state': 200, 'message': 'Ping!', 'data': []}
 
 
 api.add_resource(Ping, '/')

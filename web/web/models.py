@@ -1,5 +1,7 @@
-from web import db
+from flask_sqlalchemy import SQLAlchemy
 import datetime
+
+db = SQLAlchemy()
 
 # Support for ENUMs between sqlalchemy, alembic, postgres is dodgy at best. Easier to do validation server-side.
 
