@@ -16,5 +16,6 @@ setup(
         'requests-oauthlib==0.8.0',
         'flask-login==0.4.0',
         'flask-cors==3.0.2',
+        'uwsgi',
     ],
 )

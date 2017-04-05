@@ -17,9 +17,10 @@ RUN rm certificate.pem; rm key.key
 EXPOSE 80
 EXPOSE 443
 
-# Use the below for a slightly more lightweight debugging experience locally.
 RUN pip3 install -e ./web
-CMD ["flask", "run", "--host=0.0.0.0", "--port=80"]
+
+# Use the below for a slightly more lightweight debugging experience locally.
+#CMD ["flask", "run", "--host=0.0.0.0", "--port=80"]
 
 # Use this for prod
-#CMD ["uwsgi", "--socket", "0.0.0.0:8000", "--protocol=http", "--wsgi-file", "/var/www/web/wsgi.py", "--callable", "app", "--logto", "/var/log/uwsgi.log", "--py-autoreload", "1"]
+CMD ["uwsgi", "--socket", "0.0.0.0:8000", "--protocol=http", "--wsgi-file", "/var/www/web/wsgi.py", "--callable", "app", "--logto", "/var/log/uwsgi.log", "--py-autoreload", "1"]
