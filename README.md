@@ -1,8 +1,3 @@
-# References
-
-* [Compose file reference](https://docs.docker.com/compose/compose-file/)
-* [Dockerfile reference](https://docs.docker.com/engine/reference/builder/)
-
 # Usage
 
 ```
@@ -15,14 +10,13 @@ docker-compose up
 # start container, run bash instead of default CMD
 docker-compose run --rm web bash
 ```
+
 # Prod tips
 * Remember to use the prod docker-compose file. 
-* Reminder to update your .env file, and to enforce SSL with nginx.
-
+* Reminder to update your `.env` file instead of the `.dev` one... and to enforce SSL with nginx.
 
 # Development tips
-* It's pretty convenient to test the API in your browser when developing locally. To do this you'll need to set an alias for `tabula.life` in `/etc/hosts` and then hit the API at `tabula.life:8080/<route>`. This is a bit of a hack around the domain's Google allows you to redirect the user to after receiving oauth.
-* Run `python3 manage.py db {migrate | upgrade}` to get your DB up to date. If all hell breaks loose, but you're certain that the current schema is correct, even if alembic doesn't think so, run `python3 manage.py db alembic stamp head`. To populate the tables for local dev run `populate_db.py`. All of these commands need to be run from within the `tabula` container. You can hop on using `docker exec -it 'tabula' bash`.
+* It's pretty convenient to test the API in your browser when developing locally. To do this you'll need to set an alias for `tabula.life` in `/etc/hosts` and then hit the API at `tabula.life/<route>`. This is a bit of a hack around the domain's Google allows you to redirect the user to after receiving oauth.
 * Use Postman for local dev of API. https://www.getpostman.com/docs/interceptor_cookies and https://www.getpostman.com/docs/working_with_cookies are relevant.
 * To do quick logging, use `import sys; print(variable, file=sys.stderr)`
 
@@ -35,3 +29,5 @@ docker-compose run --rm web bash
 * http://container-solutions.com/understanding-volumes-docker/
 * https://www.digitalocean.com/community/tutorials/an-introduction-to-oauth-2
 * http://alembic.zzzcomputing.com/en/latest/tutorial.html
+* [Compose file reference](https://docs.docker.com/compose/compose-file/)
+* [Dockerfile reference](https://docs.docker.com/engine/reference/builder/)
