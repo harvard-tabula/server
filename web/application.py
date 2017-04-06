@@ -77,7 +77,7 @@ class OAuth2Callback(Resource):
     def get(self):
 
         if current_user is not None and current_user.is_authenticated:
-            return authenticated_redirect
+            return redirect('http://localhost:3000/userRedux')
 
         if 'error' in request.args:
             if request.args.get('error') == 'access_denied':
@@ -131,7 +131,7 @@ class OAuth2Callback(Resource):
 
                 login_user(user, remember=False)
 
-                return authenticated_redirect
+                return redirect('http://localhost:3000/userRedux') 
 
             return {'state': 500, 'message': 'Unable to authenticate token.'}
 
