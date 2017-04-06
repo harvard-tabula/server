@@ -60,17 +60,16 @@ class Login(Resource):
 
     def get(self):
         if current_user.is_authenticated:
-            return authenticated_redirect
+            return redirect('http://localhost:3000/userRedux')
         google = get_google_auth()
         auth_url, state = google.authorization_url(
             Auth.AUTH_URI, access_type='offline', hd='college.harvard.edu')
         session['oauth_state'] = state
-        return redirect('http://localhost:3000/userRedux')
-        #return {
-        #    'state': 302,
-        #    'message': 'The browser must be manually redirected',
-        #    'redirect': auth_url
-        #}
+        return {
+            'state': 302,
+            'message': 'The browser must be manually redirected',
+            'redirect': auth_url
+        }
 
 
 class OAuth2Callback(Resource):
