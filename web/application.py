@@ -65,11 +65,12 @@ class Login(Resource):
         auth_url, state = google.authorization_url(
             Auth.AUTH_URI, access_type='offline', hd='college.harvard.edu')
         session['oauth_state'] = state
-        return {
-            'state': 302,
-            'message': 'The browser must be manually redirected',
-            'redirect': auth_url
-        }
+        return redirect('http://localhost:3000/userRedux')
+        #return {
+        #    'state': 302,
+        #    'message': 'The browser must be manually redirected',
+        #    'redirect': auth_url
+        #}
 
 
 class OAuth2Callback(Resource):
