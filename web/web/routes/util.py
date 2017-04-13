@@ -21,7 +21,7 @@ class UI(Resource):
             'data': {
                 'ethnicities': list(Ethnicity),
                 'genders': list(Gender),
-                'grades': list(Grade),
+                'grades': Grade,
                 'terms': list(Term),
                 'tags_categories': Categories
             }

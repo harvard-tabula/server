@@ -6,4 +6,4 @@ app = Flask(__name__)
 app.config.from_object(config.DevelopmentConfig)
 db.init_app(app)
 
-from web.routes import util, auth, course, user
+from web.routes import util, auth, course, user, recommendation

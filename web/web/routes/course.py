@@ -80,15 +80,16 @@ class CourseSearch(Resource):  # TODO Search against concentration.synonym
         for i, token in enumerate(tokens):
             if token in alias_map:
                 tokens[i] = alias_map[token]
+        query = ' '.join(tokens)
 
-        courses = Counter()
-        for token in tokens:
-            res = db.session.query(Course).filter(
-                    Course.name_long.like('%{}%'.format(token)) |
-                    Course.name_short.like('%{}%'.format(token)) |
-                    Course.description.like('%{}%'.format(token))
-                    ).limit(20)
-            courses.update([course for course in res])
+        courses = set()
+
+        res = db.session.query(Course).filter(
+            Course.name_long.like('%{}%'.format(query)) |
+            Course.name_short.like('%{}%'.format(query)) |
+            Course.description.like('%{}%'.format(query))
+        ).limit(10)
+        courses.update([course for course in res])
 
         result = {
             'state': 200,
@@ -100,7 +101,7 @@ class CourseSearch(Resource):  # TODO Search against concentration.synonym
                     'title': course.name_long,
                     'description': course.description
                 }
-                for course, rank in courses.most_common(10)
+                for course in courses
             ]
         }
 

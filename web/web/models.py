@@ -18,7 +18,7 @@ Term = {
     "Winter",
 }
 
-Grade = {
+Grade = [
     "A",
     "A-",
     "B+",
@@ -32,15 +32,12 @@ Grade = {
     "D-",
     "E+",
     "E",
-    "E-",
-    "F+",
-    "F",
     "SAT",
     "UNSAT",
-    "W",
-    "P",
-    "F",
-}
+    "PASS",
+    "FAIL",
+    "WITHDRAWN",
+]
 
 Ethnicity = {
     "White",

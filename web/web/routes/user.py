@@ -1,4 +1,3 @@
-from web import app
 from web.models import db, User, UserProfile, Semester, UserHistory, Tag, Term, Grade, Ethnicity, Gender
 from web.routes import api
 from flask import session
