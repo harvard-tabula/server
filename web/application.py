@@ -230,7 +230,11 @@ class Profile(Resource):
 
         # TODO Currently failing silently without notifying the user
         user_profile.concentration_id = args['concentration_id']
-        user_profile.tags = db.session.query(Tag).filter(Tag.id.in_(args['tag_ids'])).all()
+
+        if args['tag_ids']:
+            tag_ids = args['tag_ids']
+            if len(tag_ids) > 0:
+                user_profile.tags = db.session.query(Tag).filter(Tag.id.in_(args['tag_ids'])).all()
 
         # Handle general profile data
         if args.get('gender'):
