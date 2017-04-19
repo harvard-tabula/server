@@ -13,7 +13,7 @@ server {
     add_header 'Access-Control-Allow-Methods' 'GET, PUT, DELETE';
 
     # Force SSL on all connections
-    ssl on;
+    # ssl on;
 
     location / {
         proxy_pass http://web:8000;

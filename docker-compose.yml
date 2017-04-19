@@ -4,9 +4,8 @@ services:
     build: .
     container_name: tabula
     env_file:
-      - '.env'
+      - '.dev'
     ports:
-      - "8080:8080"
       - "443:443"
       - "80:80"
     depends_on:

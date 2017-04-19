@@ -1,5 +1,7 @@
-from web import db
+from flask_sqlalchemy import SQLAlchemy
 import datetime
+
+db = SQLAlchemy()
 
 # Support for ENUMs between sqlalchemy, alembic, postgres is dodgy at best. Easier to do validation server-side.
 
@@ -16,7 +18,7 @@ Term = {
     "Winter",
 }
 
-Grade = {
+Grade = [
     "A",
     "A-",
     "B+",
@@ -30,15 +32,12 @@ Grade = {
     "D-",
     "E+",
     "E",
-    "E-",
-    "F+",
-    "F",
     "SAT",
     "UNSAT",
-    "W",
-    "P",
-    "F",
-}
+    "PASS",
+    "FAIL",
+    "WITHDRAWN",
+]
 
 Ethnicity = {
     "White",

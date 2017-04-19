@@ -33,7 +33,7 @@ def load_departments(path):
 
 def load_semesters():
 
-    semesters = [(year, term) for term in ['Fall', 'Spring'] for year in range(2004, 2030)]
+    semesters = [(year, term) for term in [term for term in models.Term] for year in range(2004, 2030)]
     for semester in semesters:
         sem = models.Semester(semester[0], semester[1])
         db.session.add(sem)
@@ -109,7 +109,8 @@ if __name__ == '__main__':
 
     See http://alembic.zzzcomputing.com/en/latest/tutorial.html if you're confused.
     """
-    load_semesters()
-    load_tags()
-    load_departments('./data/departments.csv')
-    load_courses('./data/course_table.csv')
+    with app.app_context():
+        load_semesters()
+        load_tags()
+        load_departments('./data/departments.csv')
+        load_courses('./data/course_table.csv')
