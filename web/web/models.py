@@ -143,19 +143,29 @@ class UserProfile(db.Model):
 class Concentration(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(255))
-    group_code = db.Column(db.String(30))
     user_profiles = db.relationship('UserProfile', backref='concentration')
-    courses = db.relationship('Course', backref='concentration')
-    synonym = db.Column(db.String(4))
 
-    def __init__(self, dpt_id, name, group_code, synonym=None):
-        self.id = dpt_id
+    def __init__(self, concentration_id, name):
+        self.id = concentration_id
         self.name = name
-        self.group_code = group_code
-        self.synonym = synonym
 
     def __repr__(self):
         return '<Concentration name={}>'.format(self.name)
+
+
+class Department(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(255))
+    catalog_number = db.Column(db.String(30))
+    courses = db.relationship('Course', backref='department')
+
+    def __init__(self, dpt_id, name, catalog_number):
+        self.id = dpt_id
+        self.name = name
+        self.catalog_number = catalog_number
+
+    def __repr__(self):
+        return '<Department name={}>'.format(self.name)
 
 
 class Course(db.Model):
@@ -165,14 +175,16 @@ class Course(db.Model):
     name_long = db.Column(db.String(255))  # e.g. Software Engineering
     description = db.Column(db.Text)
     course_histories = db.relationship('UserHistory',  backref='course')
-    concentration_id = db.Column(db.Integer, db.ForeignKey('concentration.id'))
+    department_id = db.Column(db.Integer, db.ForeignKey('department.id'))
+    prerequisites = db.Column(db.Text)
 
-    def __init__(self, harvard_id, name_short, name_long, description, concentration_id):
+    def __init__(self, harvard_id, name_short, name_long, description, department_id, prerequisites):
         self.harvard_id = harvard_id
         self.name_short = name_short
         self.name_long = name_long
         self.description = description
-        self.concentration_id = concentration_id
+        self.department_id = department_id
+        self.prerequisites = prerequisites
 
     def __repr__(self):
         return '<Course name={}>'.format(self.name_short)

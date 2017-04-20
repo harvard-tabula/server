@@ -17,5 +17,6 @@ setup(
         'flask-login==0.4.0',
         'flask-cors==3.0.2',
         'uwsgi',
+        'pandas',
     ],
 )
