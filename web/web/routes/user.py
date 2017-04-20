@@ -79,7 +79,7 @@ class Profile(Resource):
 
         args = self.parser.parse_args()
 
-        # TODO Currently failing silently without notifying the user
+        # TODO Wrap the commit in a try - except block to handle errors with out of bound IDs.
         user_profile.concentration_id = args['concentration_id']
 
         if args['tag_ids']:
@@ -148,7 +148,8 @@ class History(Resource):
                     'name_short': user_history.course.name_short,
                     'name_long': user_history.course.name_long,
                     'description': user_history.course.description,
-                    'concentration': user_history.course.concentration.name
+                    'department': user_history.course.department.name,
+                    'prerequisites': user_history.course.prerequisites
                 }
             })
 

@@ -1,33 +1,29 @@
 from web import app, db, models
-import csv
+import pickle
+import pandas
 
 
 def load_courses(path):
-    with open(path, encoding='latin') as f:
-        f.readline()
-        reader = csv.reader(f)
-        for row in reader:
-            course_id = int(row[4])
-            name_short = row[3]
-            name_long = row[0]
-            description = row[1]
-            dpt_id = int(row[2])
-            course = models.Course(course_id, name_short, name_long, description, dpt_id)
-            db.session.add(course)
+    courses = pickle.load(open(path, 'rb'))
+    for _, (harvard_id, dpt_id, description, name_long, name_short, prerequisites) in courses.iterrows():
+        course = models.Course(int(harvard_id), name_short, name_long, description, int(dpt_id), prerequisites)
+        db.session.add(course)
     db.session.commit()
 
 
 def load_departments(path):
-    with open(path, encoding='latin') as f:
-        f.readline()
-        reader = csv.reader(f)
-        for row in reader:
-            dpt_id = int(row[0])
-            name = row[1]
-            group_code = row[2]
-            synonym = row[3] if row[3] else None
-            course = models.Concentration(dpt_id, name, group_code, synonym)
-            db.session.add(course)
+    departments = pickle.load(open(path, 'rb'))
+    for department_id, (catalog_number, name) in departments.iterrows():
+        department = models.Department(int(department_id), name, catalog_number)
+        db.session.add(department)
+    db.session.commit()
+
+
+def load_concentrations(path):
+    concentrations = pickle.load(open(path, 'rb'))
+    for concentration_id, (name, ) in concentrations.iterrows():
+        concentration = models.Concentration(int(concentration_id), name)
+        db.session.add(concentration)
     db.session.commit()
 
 
@@ -112,5 +108,6 @@ if __name__ == '__main__':
     with app.app_context():
         load_semesters()
         load_tags()
-        load_departments('./data/departments.csv')
-        load_courses('./data/course_table.csv')
+        load_concentrations('./data/concentration_db.pkl')
+        load_departments('./data/department_db.pkl')
+        load_courses('./data/course_db.pkl')
