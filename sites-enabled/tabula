@@ -8,12 +8,8 @@ server {
     ssl_certificate         /certs/certificate.pem;
     ssl_certificate_key     /certs/key.key;
  
-    add_header 'Access-Control-Allow-Origin' 'http://localhost:3000';
-    add_header 'Access-Control-Allow-Credentials' 'true';
-    add_header 'Access-Control-Allow-Methods' 'GET, PUT, DELETE';
-
     # Force SSL on all connections
-    # ssl on;
+    ssl on;
 
     location / {
         proxy_pass http://web:8000;
