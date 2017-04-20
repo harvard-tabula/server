@@ -16,7 +16,7 @@ class Recommendation(Resource):  # TODO Plug in an actual recommendation algorit
         res = {
             'course': {
                 'id': course.id,
-                'catalogue_number': course.name_short,
+                'catalog_number': course.name_short,
                 'title': course.name_long,
                 'description': course.description,
             },

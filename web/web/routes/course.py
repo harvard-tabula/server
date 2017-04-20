@@ -2,7 +2,6 @@ from web.routes import api
 from web.models import db, Course, Concentration, Tag, Semester
 from flask_restful import Resource
 from flask_login import login_required
-from collections import Counter
 
 
 #
@@ -30,7 +29,7 @@ class AllCourses(Resource):
         for course in courses:
             result['data'].append({
                                     'id': course.id,
-                                    'catalogue_number': course.name_short,
+                                    'catalog_number': course.name_short,
                                     'title': course.name_long,
                                     'description': course.description
                                    })
@@ -57,7 +56,7 @@ class Courses(Resource):
         # Note: Because the other endpoints return resource relevant data in an array, I'm keeping the standard here.
         result['data'].append({
                                 'id': course.id,
-                                'catalogue_number': course.name_short,
+                                'catalog_number': course.name_short,
                                 'title': course.name_long,
                                 'description': course.description
                                })
@@ -97,7 +96,7 @@ class CourseSearch(Resource):  # TODO Search against concentration.synonym
             'data': [
                 {
                     'id': course.id,
-                    'catalogue_number': course.name_short,
+                    'catalog_number': course.name_short,
                     'title': course.name_long,
                     'description': course.description
                 }
