@@ -1,0 +1,268 @@
+{
+	"variables": [],
+	"info": {
+		"name": "Tabula Public API",
+		"_postman_id": "7eb7d8a2-3da7-ca29-c117-02f1cbbf9a51",
+		"description": "",
+		"schema": "https://schema.getpostman.com/json/collection/v2.0.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "History",
+			"request": {
+				"url": "https://api.tabula.life/history",
+				"method": "PUT",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"description": ""
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"id\": 80,\n  \"semester\": \"Spring 2017\",\n  \"grade\": \"A\",\n  \"course_tag_ids\": [3],\n  \"hours\": 10\n}"
+				},
+				"description": "If the user already has a record for the course with the given `id`, it is updated. Otherwise it is created. \n\nNote for all calls involving courses that there are two different IDs. There is the primary key in our own datastore; and there is the `course_id` used by Harvard to identify classes. We use the former in queries to the API."
+			},
+			"response": []
+		},
+		{
+			"name": "History",
+			"request": {
+				"url": "https://api.tabula.life/history",
+				"method": "GET",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"description": ""
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"id\": 4,\n  \"semester\": \"Spring 2017\",\n  \"grade\": \"A\"\n}"
+				},
+				"description": "Retrieves the full course history for the currently authenticated user.\n\nExample response: \n\n```{\n  \"data\": [\n    {\n      \"course\": {\n        \"concentration\": \"United States in the World\",\n        \"course_id\": 2082,\n        \"description\": \"Events such as Teach for America's 20th anniversary and films like Waiting for Superman highlight urgent concerns about the quality and reach of American schooling in the 21st century. Against this backdrop, the course grapples with several dilemmas that have defined American K-12 education throughout history. What constitutes educational excellence? Can excellence be achieved for everyone? Why do we have schools and what is their purpose? Given that families, politicians, and the courts often disagree vehemently about the answers to these questions, the course considers who and what will define the future of American education and its role in society.\",\n        \"id\": 4,\n        \"name_long\": \"Dilemmas of Equity and Excellence in American K-12 Education\",\n        \"name_short\": \"US-WORLD 35\"\n      },\n      \"grade\": \"A\",\n      \"id\": 1,\n      \"semester\": \"Spring 2017\"\n    }\n  ],\n  \"state\": 200\n}```"
+			},
+			"response": []
+		},
+		{
+			"name": "History",
+			"request": {
+				"url": "https://api.tabula.life/history",
+				"method": "DELETE",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"description": ""
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"id\": 80,\n  \"semester\": \"Spring 2017\"\n}"
+				},
+				"description": "If the user has a record for the course with `course_id = id` it is deleted. Otherwise a 404 is returned."
+			},
+			"response": []
+		},
+		{
+			"name": "Profile",
+			"request": {
+				"url": "https://api.tabula.life/profile",
+				"method": "PUT",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"description": ""
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"gender\": \"Male\",\n  \"ethnicity\": \"White\",\n  \"name\": \"Joe Kahn\",\n  \"tag_ids\": [10, 13, 42],\n  \"concentration_id\": 50,\n  \"years_coding\": 2.5,\n  \"year\": 2018\n}"
+				},
+				"description": "The values in the body will completely replace (or create) previously stored values. This is especially relevant for `tag_ids`. If the user has previously selected `[1, 2, 4]` and then selects `5`, the requests must include `[1, 2, 4, 5]` or the previous tags will be lost.\n\nAny updates to the fields included in the `user_profile` should result in the entire profile being sent to the backend. \n\nNote that `concentration_id` is used rather than `concentration_name`. "
+			},
+			"response": []
+		},
+		{
+			"name": "Profile",
+			"request": {
+				"url": "https://api.tabula.life/profile",
+				"method": "GET",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"description": ""
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"gender\": \"Male\",\n  \"ethnicity\": \"White\",\n  \"name\": \"Joe Kahn\",\n  \"tag_ids\": [1, 5, 13],\n  \"concentration\": \"Computer Science\",\n  \"years_coding\": 2.5,\n  \"year\": 2018\n}"
+				},
+				"description": "Returns all data required to populate the currently authenticated user's profile, in addition to tags related to professional interests, milestones, academic interests, and coding languages. \n\nThe `avatar` is a link to the User's @college image hosted by one of Google's CDN.\n\nExample response: \n\n```\n{\n  \"data\": {\n    \"avatar\": \"https://lh3.googleusercontent.com/-EMLj060NbwQ/AAAAAAAAAAI/AAAAAAAAAQY/yDW9Q93tJf4/photo.jpg\",\n    \"concentration\": \"Computer Science\",\n    \"email\": \"josephkahn@college.harvard.edu\",\n    \"ethnicity\": \"White\",\n    \"gender\": \"Male\",\n    \"name\": \"Joe Kahn\",\n    \"tags\": [\n      {\n        \"category\": \"milestone\",\n        \"id\": 1,\n        \"name\": \"Built a mobile app\"\n      },\n      {\n        \"category\": \"professional\",\n        \"id\": 5,\n        \"name\": \"Consulting\"\n      },\n      {\n        \"category\": \"academic\",\n        \"id\": 13,\n        \"name\": \"ML\"\n      }\n    ],\n    \"year\": \"2018\",\n    \"years_coding\": 2.5\n  },\n  \"message\": \"User Profile retrieved successfully.\",\n  \"state\": 200\n}\n```"
+			},
+			"response": []
+		},
+		{
+			"name": "Semesters",
+			"request": {
+				"url": "https://api.tabula.life/semesters",
+				"method": "GET",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"description": ""
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"gender\": \"Male\",\n  \"ethnicity\": \"White\",\n  \"name\": \"Joe Kahn\",\n  \"tag_ids\": [1, 200, 13, -1, 13],\n  \"concentration\": \"Computer Science\",\n  \"years_coding\": 2.5,\n  \"year\": 2018\n}"
+				},
+				"description": "Get all semesters\n\nExample response: \n```\n{\n  \"data\": [\n    {\n      \"id\": 1,\n      \"semester\": \"Fall 2010\"\n    },\n    {\n      \"id\": 2,\n      \"semester\": \"Fall 2011\"\n    },\n    {\n      \"id\": 3,\n      \"semester\": \"Fall 2012\"\n    },\n    {\n      \"id\": 4,\n      \"semester\": \"Fall 2013\"\n    },\n    ...\n```"
+			},
+			"response": []
+		},
+		{
+			"name": "Ping",
+			"request": {
+				"url": "https://api.tabula.life/",
+				"method": "GET",
+				"header": [],
+				"body": {},
+				"description": ""
+			},
+			"response": []
+		},
+		{
+			"name": "Concentrations",
+			"request": {
+				"url": "https://api.tabula.life/concentrations",
+				"method": "GET",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"description": ""
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"gender\": \"Male\",\n  \"ethnicity\": \"White\",\n  \"name\": \"Joe Kahn\",\n  \"tag_ids\": [1, 200, 13, -1, 13],\n  \"concentration\": \"Computer Science\",\n  \"years_coding\": 2.5,\n  \"year\": 2018\n}"
+				},
+				"description": "Get all concentrations\n\nExample response: \n```\n{\n  \"data\": [\n    {\n      \"id\": 1,\n      \"name\": \"African and African American Studies\"\n    },\n    {\n      \"id\": 2,\n      \"name\": \"Gikuyu\"\n    },\n    {\n      \"id\": 3,\n      \"name\": \"Swahili\"\n    },\n    {\n      \"id\": 4,\n      \"name\": \"Twi\"\n    },\n...\n```"
+			},
+			"response": []
+		},
+		{
+			"name": "Tags",
+			"request": {
+				"url": "https://api.tabula.life/tags",
+				"method": "GET",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"description": ""
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"gender\": \"Male\",\n  \"ethnicity\": \"White\",\n  \"name\": \"Joe Kahn\",\n  \"tag_ids\": [1, 200, 13, -1, 13],\n  \"concentration\": \"Computer Science\",\n  \"years_coding\": 2.5,\n  \"year\": 2018\n}"
+				},
+				"description": "Get all tags\n\nExample response: \n\n```\n{\n  \"data\": [\n    {\n      \"category\": \"milestone\",\n      \"id\": 1,\n      \"name\": \"Built a mobile app\"\n    },\n    {\n      \"category\": \"language\",\n      \"id\": 2,\n      \"name\": \"Haskell\"\n    },\n    {\n      \"category\": \"academic\",\n      \"id\": 3,\n      \"name\": \"Graphics\"\n    },\n    {\n      \"category\": \"academic\",\n      \"id\": 4,\n      \"name\": \"Data Structures\"\n    },\n...\n```\n"
+			},
+			"response": []
+		},
+		{
+			"name": "Logout",
+			"request": {
+				"url": "https://api.tabula.life/logout",
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"description": ""
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"id\": 4\n}"
+				},
+				"description": "Clears the session data for the current user. Note that Google's believe of the user's session may outlast our own. In addition, this does not clear cookies from the browser, only from the internally represented session."
+			},
+			"response": []
+		},
+		{
+			"name": "AllCourses",
+			"request": {
+				"url": "https://api.tabula.life/allcourses/page/1",
+				"method": "GET",
+				"header": [],
+				"body": {},
+				"description": "Paginated endpoint for all courses\n\nExample response: \n\n```\n{\n  \"data\": [\n    {\n      \"catalogue_number\": \"EXPOS 20.133\",\n      \"description\": \"This course inquires into the origin and political and moral nature of the state, into its forms, functions, and connections with the education and the erotic life of its citizens. Readings to be discussed and written on are taken from Plato, Aristotle, Rousseau, Tocqueville, and Marx. Throughout the course, students adjudicate between different conceptions of the state and their ends, and examine the source of power of the state.\",\n      \"id\": 1,\n      \"title\": \"Philosophy of the State\"\n    },\n    {\n      \"catalogue_number\": \"SOCIOL 263\",\n      \"description\": \"The seminar explores the emergence, dynamics and interaction of cultural, structural and institutional processes in the development, and underdevelopment, of capitalism in selected western and non-western societies. Among the topics explored, through close study of selected texts, are: merchant capital, network channeling and cultural change in renaissance Italy; institutional, cultural and imperial factors in the rise and divergence of West European capitalism; networks and informal institutions in the rise of capitalism in China; cultural and institutional change in Tokugawa Japan; and the institutional and cultural origins of development and underdevelopment in Latin America and the Caribbean. Our readings and discussions will be guided by the recurring theoretical problems of causality, origins, continuity and change in institutional and cultural processes and the fundamental problem of how the past influences later periods and present outcomes.\",\n      \"id\": 2,\n      \"title\": \"Historical Sociology: Cultural and Institutional Perspectives\"\n    },\n...\n```"
+			},
+			"response": []
+		},
+		{
+			"name": "Courses",
+			"request": {
+				"url": "https://api.tabula.life/courses/1",
+				"method": "GET",
+				"header": [],
+				"body": {},
+				"description": "Query courses by ID\n\nExample response: \n\n```\n{\n  \"data\": [\n    {\n      \"catalogue_number\": \"EXPOS 20.133\",\n      \"description\": \"This course inquires into the origin and political and moral nature of the state, into its forms, functions, and connections with the education and the erotic life of its citizens. Readings to be discussed and written on are taken from Plato, Aristotle, Rousseau, Tocqueville, and Marx. Throughout the course, students adjudicate between different conceptions of the state and their ends, and examine the source of power of the state.\",\n      \"id\": 1,\n      \"title\": \"Philosophy of the State\"\n    }\n  ],\n  \"message\": \"Course successfully retrieved.\",\n  \"state\": 200\n}\n```"
+			},
+			"response": []
+		},
+		{
+			"name": "Course Search",
+			"request": {
+				"url": "https://api.tabula.life/coursesearch/Artificial%20Intelligence",
+				"method": "GET",
+				"header": [],
+				"body": {},
+				"description": "Endpoint for querying courses. Searches for the query string in course descriptions, catalogue numbers (e.g. COMPSCI 50), and the actual course name (e.g. Introduction to Computer Science I).\n\nReturns up to ten classes ranked by relevance.\n\nExample response: \n\n```\n{\n  \"data\": [\n    {\n      \"catalogue_number\": \"COMPSCI 280R\",\n      \"description\": \"Seminar course exploring research directions in artificial intelligence (AI), typically combining two or more of such areas as multi-agent systems, natural-language processing, machine learning, reasoning under uncertainty, representation systems. Topic for Spring 2017: Multi-agent systems: collaboration, coordination and loosely-coupled teamwork.\",\n      \"id\": 186,\n      \"title\": \"Advanced Topics in Artificial Intelligence\"\n    },\n    {\n      \"catalogue_number\": \"COMPSCI 182\",\n      \"description\": \"Introduction to AI focused on problems in reasoning about action and rational decision making, covering search, knowledge representation and planning. Search: heuristics, informed search and optimization; constraint satisfaction; game playing. Knowledge representation: logics, efficient logical inference, reasoning about categories. Planning: action representations and planning algorithms, hierarchical task networks, sequential decision making. Applications to multi-agent systems, robotics and natural-language processing. Discussion of relevant work in philosophy, economics, and decision theory.\",\n      \"id\": 437,\n      \"title\": \"Artificial Intelligence\"\n    }\n  ],\n  \"message\": \"Courses successfully retrieved.\",\n  \"state\": 200\n}\n```"
+			},
+			"response": []
+		},
+		{
+			"name": "Login",
+			"request": {
+				"url": "https://api.tabula.life/login",
+				"method": "GET",
+				"header": [],
+				"body": {},
+				"description": ""
+			},
+			"response": []
+		},
+		{
+			"name": "UI",
+			"request": {
+				"url": "https://api.tabula.life/ui",
+				"method": "GET",
+				"header": [],
+				"body": {},
+				"description": "Returns validation data for the frontend since the server is the record of truth for grade, gender, ethnicity ENUMs, etc. "
+			},
+			"response": []
+		},
+		{
+			"name": "Recommendation",
+			"request": {
+				"url": "https://api.tabula.life/recommendation/1",
+				"method": "GET",
+				"header": [],
+				"body": {},
+				"description": "Returns a course recommendation to the currently authenticated user for the course with `id` = `course_id` in `http://tabula.life/recommendation/<int:course_id>` "
+			},
+			"response": []
+		}
+	]
+}
