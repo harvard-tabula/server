@@ -51,28 +51,28 @@ It also stitches together a bunch of technologies you'll probably want to famili
 * To handle OAuth you'll need to update `/etc/hosts` on Mac (or the equivalent for your OS) to add a mapping from `0.0.0.0` (which is the host the server is forwarded to on your local machine) to a domain currenty registered on [Joe](https://www.github.com/josephwandile)'s Google Developer Console as an Authorized Redirect URL. Ideally use the mapping from  `0.0.0.0` to `tabula.life`. If you really want to use a different mapping ask Joe to add it to the developer console.
 * Make sure you've got the TLS key pair in the root directory. For the moment development doesn't use `https`, but we'd rather not have separate Dockerfiles for dev and prod since the added time taken to copy the certificates onto the dev container even though they're not being used is negligible.
 * Make sure the line `ssl on;` in `sites-enabled/tabula` is commented out or NGINX will try to enforce `https` even though the certificates will be considered invalid by the browser.
-* We highly recommend installing the Postman Chrome App as well as the 
 
 ### Getting started
 * Navigate to the project root and run `docker-compose build`. This will create all of the containers we care about. 
 * Then run `docker-compose up`, which will start the container. 
-* By default the dev server is also running with uWSGI and NGINX with live-reloading enabled. If you'd like you can also run the flask web server (see comments in the Dockerfile). If you choose the default you'll need to hop onto the container using `docker exec -it 'tabula' bash` and run NGINX in the background to expose uWSGI to your local machine. i.e. run `nginx &`. 
-* If this is your first time running locally you'll need to run the database migrations and populate the database. All this requires is running (on the container) `python3 manage.py db upgrade && python3 populate_db.py`. See the README in the `migrations` directory for more info on using Alembic. NB: If you kill the container inappropriately you may lose data in dev and need to run the migrations and populate the DB again. This isn't a huge deal; the whole process takes a couple seconds at most.
+* By default the dev server runs with uWSGI and NGINX with live-reloading enabled. If you'd like you can run the flask web server instead (see comments in the Dockerfile). If you choose to use NGINX you'll need to hop onto the container using `docker exec -it 'tabula' bash` and run NGINX in the background to expose uWSGI to your local machine. i.e. run `nginx &`. 
+* If this is your first time running locally you'll need to run the database migrations and populate the database. All this requires is running (on the container) `python3 manage.py db upgrade && python3 populate_db.py`. See the comments in `populate_db.py` for more info on using Alembic. NB: If you kill the container inappropriately you may lose data in dev and need to run the migrations and populate the DB again. This isn't a huge deal; the whole process takes a couple seconds at most.
 * When you're done run `docker-compose down` from the project root.
 
 ### Notes
-* If you're not using the bare flask server, server logs will be found at `/var/logs/uwsgi.log` on the actual container. This is the same for prod. Feel free to change the log path in the Dockerfile.
+* If you're not using the bare flask server, server logs will be found at `/var/logs/uwsgi.log` on the actual container. This is the same for prod. Feel free to change the log path in the Dockerfile. With flask they'll be flushed to the console.
 
 ## Prod
 ### Requirements
 
 For the moment the deployment process is painfully manual. It's totally possible to automate, but not a priority for the moment.
 
-* You'll need to install Github, Docker, docker-compose and so on on the EC2 instance.
+* You'll need to install Github, Docker, docker-compose and potentially a couple other dependencies on the EC2 instance. Vim is also really helpful.
 * Clone the repository on the box and copy over relevant files securely.
 * All the same files need to be in the project root as for dev. Technically you can ignore the `.dev` file since only the `.env` is used in production. Likewise for `docker-compose.yml` vs. `docker-compose-prod.yml`. 
 * Make sure to have the line `ssl on;` uncommented in the NGINX config. 
 * The server expects there to be a running Postgres instance somewhere. This can be via RDS (as is currently the case) or it could be another container running on the same box (as is the case for dev), a postgres server running on EC2, etc. Ultimately comes down to cost vs. inconvenience. Paying for hours on RDS is expensive given that the project only gets hits at the beginning of the semester.
+* Send Joe your public key so that he can grant you access to the server. You'll ssh on using something like `ssh -i ~/tabula_admin/ec2_private_key.pem ec2-user@54.89.178.72`.
 
 ### Getting started 
 
