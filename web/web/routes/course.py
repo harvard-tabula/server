@@ -70,23 +70,22 @@ class CourseSearch(Resource):  # TODO Search against concentration.synonym
     def get(self, query):
 
         alias_map = {
-            'CS': 'COMPSCI',
-            'AM': 'APMTH',
-            'ES': 'ENG-SCI',
+            'cs': 'COMPSCI',
+            'am': 'APMTH',
+            'es': 'ENG-SCI',
         }
 
         tokens = query.split(' ')
         for i, token in enumerate(tokens):
-            if token in alias_map:
-                tokens[i] = alias_map[token]
+            if token.lower() in alias_map:
+                tokens[i] = alias_map[token.lower()]
         query = ' '.join(tokens)
 
         courses = set()
 
         res = db.session.query(Course).filter(
-            Course.name_long.like('%{}%'.format(query)) |
-            Course.name_short.like('%{}%'.format(query)) |
-            Course.description.like('%{}%'.format(query))
+            Course.name_long.ilike('%{}%'.format(query)) |
+            Course.name_short.ilike('%{}%'.format(query))
         ).limit(10)
         courses.update([course for course in res])
 

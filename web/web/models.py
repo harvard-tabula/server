@@ -5,18 +5,18 @@ db = SQLAlchemy()
 
 # Support for ENUMs between sqlalchemy, alembic, postgres is dodgy at best. Easier to do validation server-side.
 
-Gender = {
-    "Male",
+Gender = [
     "Female",
+    "Male",
     "Other"
-}
+]
 
-Term = {
+Term = [
     "Spring",
-    "Fall",
     "Summer",
+    "Fall",
     "Winter",
-}
+]
 
 Grade = [
     "A",
@@ -39,14 +39,15 @@ Grade = [
     "WITHDRAWN",
 ]
 
-Ethnicity = {
-    "White",
-    "Black",
+Ethnicity = [
     "Asian",
-    "South Asian",
+    "American Indian or Alaska Native",
+    "Black or African American",
     "Latinx",
+    "Native Hawaiian or Other Pacific Islander",
     "Other",
-}
+    "South Asian",
+]
 
 
 Categories = [

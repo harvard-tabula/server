@@ -82,7 +82,9 @@ def load_tags():
         ('Sad', 'user_history'),
         ('Angry', 'user_history'),
         ('Difficult', 'user_history'),
-        ('Learning', 'user_history')
+        ('Learning', 'user_history'),
+        ('Easy', 'user_history'),
+        ('Boring', 'user_history'),
     }
 
     for tag in tags:
