@@ -3,43 +3,74 @@ import pickle
 import pandas
 
 
+def create_or_update(model, **kwargs):
+    """
+    NB: This function assumes that the ID for a given logical entity in the DB will not change over time! i.e. do not
+    change the order of things below.
+
+    It also assumes that everything we add to the DB manually will set its own ID explicitly. Do not break that invariant
+    or sad things will happen.
+
+    However, feel free to update text if necessary. (That's the whole point.)
+    """
+    base_query = db.session.query(model).filter_by(id=kwargs['id'])
+    if not base_query.one_or_none():
+        instance = model(**kwargs)
+        db.session.add(instance)
+    else:
+        base_query.update(dict(**kwargs))
+
+
 def load_courses(path):
     courses = pickle.load(open(path, 'rb'))
-    for _, (harvard_id, dpt_id, description, name_long, name_short, prerequisites) in courses.iterrows():
-        course = models.Course(int(harvard_id), name_short, name_long, description, int(dpt_id), prerequisites)
-        db.session.add(course)
+    for course_id, (harvard_id, dpt_id, description, name_long, name_short, prerequisites) in courses.iterrows():
+        create_or_update(
+            models.Course,
+            id=int(course_id),
+            harvard_id=int(harvard_id),
+            department_id=int(dpt_id),
+            name_short=name_short,
+            name_long=name_long,
+            prerequisites=prerequisites,
+            description=description,
+        )
     db.session.commit()
 
 
 def load_departments(path):
     departments = pickle.load(open(path, 'rb'))
     for department_id, (catalog_number, name) in departments.iterrows():
-        department = models.Department(int(department_id), name, catalog_number)
-        db.session.add(department)
+        create_or_update(
+            models.Department,
+            id=int(department_id),
+            name=name,
+            catalog_number=catalog_number,
+        )
     db.session.commit()
 
 
 def load_concentrations(path):
     concentrations = pickle.load(open(path, 'rb'))
     for concentration_id, (name, ) in concentrations.iterrows():
-        concentration = models.Concentration(int(concentration_id), name)
-        db.session.add(concentration)
+        create_or_update(
+            models.Concentration,
+            id=int(concentration_id),
+            name=name,
+        )
     db.session.commit()
 
 
 def load_semesters():
 
     semesters = [(year, term) for term in [term for term in models.Term] for year in range(2004, 2030)]
-    for semester in semesters:
-        sem = models.Semester(semester[0], semester[1])
-        db.session.add(sem)
-
+    for semester_id, (year, term) in enumerate(semesters):
+        create_or_update(models.Semester, id=semester_id, year=str(year), term=term)
     db.session.commit()
 
 
 def load_tags():
 
-    tags = {
+    tags = [
         ('AI', 'academic'),
         ('Algorithms', 'academic'),
         ('Coding', 'academic'),
@@ -85,19 +116,19 @@ def load_tags():
         ('Learning', 'user_history'),
         ('Easy', 'user_history'),
         ('Boring', 'user_history'),
-    }
+    ]
 
-    for tag in tags:
-        name, category = tag
-        tag_to_add = models.Tag(name, category)
-        db.session.add(tag_to_add)
-
+    for tag_id, (name, category) in enumerate(tags):
+        create_or_update(models.Tag, id=tag_id, name=name, category=category)
     db.session.commit()
 
 
 if __name__ == '__main__':
 
     """
+    Key assumption: Data being loaded via this script is more up to date than any data on the DB. i.e. if some similar object
+    already exists in the DB, the script assumes that the one being inserted is more valid even if it contains "less" information.
+
     This script should never be used to drop or create tables. That's what Alembic is for. (Plus versioning and whatnot.)
 
     To get your DB to the correct state, run `python3 manage.py db upgrade` from the project directory.

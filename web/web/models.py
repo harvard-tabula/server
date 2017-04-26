@@ -73,11 +73,13 @@ course_tags = db.Table('course_tags',
 
 
 class Tag(db.Model):
+    constraint = db.UniqueConstraint('name', 'category')
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(50), unique=True)
     category = db.Column(db.String(20))
 
-    def __init__(self, name, category):
+    def __init__(self, id, name, category):
+        self.id = id
         self.name = name
         self.category = category
 
@@ -143,11 +145,12 @@ class UserProfile(db.Model):
 
 class Concentration(db.Model):
     id = db.Column(db.Integer, primary_key=True)
+    constraint = db.UniqueConstraint('name')
     name = db.Column(db.String(255))
     user_profiles = db.relationship('UserProfile', backref='concentration')
 
-    def __init__(self, concentration_id, name):
-        self.id = concentration_id
+    def __init__(self, id, name):
+        self.id = id
         self.name = name
 
     def __repr__(self):
@@ -155,13 +158,14 @@ class Concentration(db.Model):
 
 
 class Department(db.Model):
+    constraint = db.UniqueConstraint('name, catalog_number')
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(255))
     catalog_number = db.Column(db.String(30))
     courses = db.relationship('Course', backref='department')
 
-    def __init__(self, dpt_id, name, catalog_number):
-        self.id = dpt_id
+    def __init__(self, id, name, catalog_number):
+        self.id = id
         self.name = name
         self.catalog_number = catalog_number
 
@@ -179,7 +183,8 @@ class Course(db.Model):
     department_id = db.Column(db.Integer, db.ForeignKey('department.id'))
     prerequisites = db.Column(db.Text)
 
-    def __init__(self, harvard_id, name_short, name_long, description, department_id, prerequisites):
+    def __init__(self, id, harvard_id, name_short, name_long, description, department_id, prerequisites):
+        self.id = id
         self.harvard_id = harvard_id
         self.name_short = name_short
         self.name_long = name_long
@@ -215,12 +220,15 @@ class UserHistory(db.Model):
 
 
 class Semester(db.Model):
+
+    constraint = db.UniqueConstraint('term', 'year')
     id = db.Column(db.Integer, primary_key=True)
     term = db.Column(db.String(6))
     year = db.Column(db.String(4))
     course_histories = db.relationship('UserHistory', backref='semester')
 
-    def __init__(self, year, term):
+    def __init__(self, id, year, term):
+        self.id = id
         self.year = year
         self.term = term
 
