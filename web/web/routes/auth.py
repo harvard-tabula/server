@@ -1,7 +1,7 @@
 from web import app
 from web.models import db, User, UserProfile
 from web.routes import api
-from flask import session, request
+from flask import session, request, redirect
 from flask_restful import Resource, reqparse
 from flask_login import LoginManager, login_required, login_user, logout_user, current_user
 from requests_oauthlib import OAuth2Session
@@ -24,16 +24,15 @@ def load_user(user_id):
 def get_google_auth(state=None, token=None):
     if token:
         return OAuth2Session(Auth.CLIENT_ID, token=token)
-    if state:
-        return OAuth2Session(
-            Auth.CLIENT_ID,
-            state=state,
-            redirect_uri=Auth.REDIRECT_URI)
-    oauth = OAuth2Session(
+    # if state:  # TODO Figure out how to use state correctly.
+    #     return OAuth2Session(
+    #         Auth.CLIENT_ID,
+    #         state=state,
+    #         redirect_uri=Auth.REDIRECT_URI)
+    return OAuth2Session(
         Auth.CLIENT_ID,
         redirect_uri=Auth.REDIRECT_URI,
         scope=Auth.SCOPE)
-    return oauth
 
 
 def get_user_hash(app_unique_id):
@@ -44,18 +43,14 @@ def get_user_hash(app_unique_id):
     return user_hash.hex()
 
 
-authenticated_redirect = {
-    'state': 302,
-    'message': 'User is authenticated. Please manually redirect',
-    'redirect': 'https://www.tabula.life/user'
-}
-
-
 class Login(Resource):
 
     def get(self):
         if current_user.is_authenticated:
-            return authenticated_redirect
+            return {
+                'state': 200,
+                'message': 'User is authenticated. Please continue.',
+            }
         google = get_google_auth()
         auth_url, state = google.authorization_url(
             Auth.AUTH_URI, access_type='offline', hd='college.harvard.edu')
@@ -67,12 +62,16 @@ class Login(Resource):
         }
 
 
-class OAuth2Callback(Resource):
+class OAuth2Callback(Resource):  # TODO Figure out where the user wanted to go for the redirect.
+
+    """
+    Note: This endpoint is only ever hit by the browser. Google's auth server redirects the *browser*, NOT the frontend.
+    """
 
     def get(self):
 
         if current_user is not None and current_user.is_authenticated:
-            return authenticated_redirect
+            return redirect("http://localhost:3000/user")
 
         if 'error' in request.args:
             if request.args.get('error') == 'access_denied':
@@ -97,7 +96,7 @@ class OAuth2Callback(Resource):
             if resp.status_code == 200:
                 user_data = resp.json()
                 hd = user_data.get('hd')
-                if not hd or hd != 'college.harvard.edu':
+                if not hd or hd != 'college.harvard.edu':  # TODO: Frontend should probably have a generic error model.
                     return {'state': 401, 'message': 'Only Harvard College students have access to Tabula.'}
 
                 email = user_data['email']
@@ -126,7 +125,7 @@ class OAuth2Callback(Resource):
 
                 login_user(user, remember=False)
 
-                return authenticated_redirect
+                return redirect("http://localhost:3000/user")
 
             return {'state': 500, 'message': 'Unable to authenticate token.'}
 
