@@ -19,11 +19,11 @@ class UI(Resource):
             'state': 200,
             'message': 'Fields retrieved successfully',
             'data': {
-                'ethnicities': list(Ethnicity),
-                'genders': list(Gender),
+                'ethnicities': sorted(Ethnicity),
+                'genders': sorted(Gender),
                 'grades': Grade,
-                'terms': list(Term),
-                'tags_categories': Categories
+                'terms': sorted(Term),
+                'tags_categories': Categories,
             }
         }
 

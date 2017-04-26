@@ -34,7 +34,7 @@ class Profile(Resource):
                 'message': 'Could not find user\'s profile.'
             }
 
-        tags = [  # Currently leaving out tag.description, since we've not populated that in the DB
+        tags = [  # TODO Currently leaving out tag.description, since we've not populated that in the DB
             {
                 'id': tag.id,
                 'name': tag.name,
@@ -153,7 +153,11 @@ class History(Resource):
                 }
             })
 
-        return {'state': 200, 'data': result}
+        def key_func(course):
+            term, year = course['semester'].split(' ')[0], course['semester'].split(' ')[1]
+            return year, Term.index(term)
+
+        return {'state': 200, 'data': sorted(result, key=key_func)}
 
     def put(self):
 
