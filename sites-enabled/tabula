@@ -9,7 +9,7 @@ server {
     ssl_certificate_key     /certs/key.key;
  
     # Force SSL on all connections
-    # ssl on;
+    ssl on;
 
     location / {
         proxy_pass http://web:8000;
