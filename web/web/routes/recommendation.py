@@ -25,17 +25,21 @@ class Recommendation(Resource):  # TODO Plug in an actual recommendation algorit
             'associated_tags': [
                 {
                     "category": "academic",
-                    "id": 50,
-                    "name": "Systems",
+                    "id": 1,
+                    "name": "Algorithms",
                 }, {
-                    "category": "academic",
-                    "id": 50,
-                    "name": "Networks",
+                    "category": "professional",
+                    "id": 21,
+                    "name": "SWE - Backend",
+                }, {
+                    "category": "professional",
+                    "id": 22,
+                    "name": "SWE - Frontend",
                 }, {
                     "category": "user_history",
-                    "id": 50,
+                    "id": 36,
                     "name": "Happy",
-                }
+                },
             ],
         }
 
