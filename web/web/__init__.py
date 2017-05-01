@@ -6,12 +6,18 @@ from flask_cors import CORS
 app = Flask(__name__)
 app.config.from_object(config.DevelopmentConfig)
 
-CORS(app, origins='http://localhost:3000', supports_credentials=True, expose_headers=[
+CORS(app, 
+     origins=[
+        'https://www.tabula.life',
+        'http://localhost:3000',
+     ], 
+     supports_credentials=True, 
+     expose_headers=[
         'Access-Control-Allow-Origin',
         'Access-Control-Allow-Credentials',
         'Access-Control-Allow-Headers',
-        'Access-Control-Allow-Methods'
-    ])
+        'Access-Control-Allow-Methods',
+     ])
 
 db.init_app(app)
 

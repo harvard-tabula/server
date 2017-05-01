@@ -32,11 +32,11 @@ Grade = [
     "D-",
     "E+",
     "E",
-    "SAT",
-    "UNSAT",
-    "PASS",
-    "FAIL",
-    "WITHDRAWN",
+    "S",
+    "U",
+    "P",
+    "F",
+    "W",
 ]
 
 Ethnicity = [
@@ -47,6 +47,7 @@ Ethnicity = [
     "Native Hawaiian or Other Pacific Islander",
     "Other",
     "South Asian",
+    "White",
 ]
 
 
