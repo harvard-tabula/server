@@ -19,6 +19,7 @@ class Recommendation(Resource):  # TODO Plug in an actual recommendation algorit
                 'catalog_number': course.name_short,
                 'title': course.name_long,
                 'description': course.description,
+                'prerequisites': course.prerequisites,
             },
             'grade': 'A-',
             'hours': 10,
