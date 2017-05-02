@@ -9,6 +9,7 @@ from requests.exceptions import HTTPError
 from web.config import Auth
 import json
 import hashlib
+import os
 
 
 login_manager = LoginManager(app)
@@ -71,7 +72,7 @@ class OAuth2Callback(Resource):  # TODO Figure out where the user wanted to go f
     def get(self):
 
         if current_user is not None and current_user.is_authenticated:
-            return redirect("http://localhost:3000/user")
+            return redirect("{}".format(os.environ['FRONTEND_BASE']))
 
         if 'error' in request.args:
             if request.args.get('error') == 'access_denied':
@@ -125,7 +126,7 @@ class OAuth2Callback(Resource):  # TODO Figure out where the user wanted to go f
 
                 login_user(user, remember=False)
 
-                return redirect("http://localhost:3000/user")
+                return redirect("{}".format(os.environ['FRONTEND_BASE']))
 
             return {'state': 500, 'message': 'Unable to authenticate token.'}
 
