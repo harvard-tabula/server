@@ -206,8 +206,7 @@ class UserHistory(db.Model):
     semester_id = db.Column(db.Integer, db.ForeignKey('semester.id'))
     grade = db.Column(db.String(5))
     hours = db.Column(db.Integer)
-    course_tags = db.relationship('Tag', secondary=course_tags, cascade="all",
-                           backref=db.backref('user_histories', lazy='dynamic'))
+    course_tags = db.relationship('Tag', secondary=course_tags, backref=db.backref('user_histories', lazy='dynamic'))
 
     def __init__(self, user_hash, course_id, semester_id, grade, hours=None):
         self.user_hash = user_hash
